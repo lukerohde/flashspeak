@@ -9,7 +9,7 @@
       <i class="bi bi-save"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %}
     </button>
   </form>
-  <a href="{% url 'thing_list' %}" class="btn btn-secondary mt-3">
+  <a href="{% url 'main:thing_list' %}" class="btn btn-secondary mt-3">
     <i class="bi bi-x-circle"></i> Cancel
   </a>
 {% endblock %} 

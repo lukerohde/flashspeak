@@ -1,0 +1,3 @@
+name: example-project-s3
+runtime: python
+description: S3 infrastructure for Our Meals recipe photos

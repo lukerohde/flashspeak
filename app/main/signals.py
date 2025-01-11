@@ -14,3 +14,7 @@ def create_user_thing(sender, instance, created, **kwargs):
             name=f"{instance.username}'s Thing",
             owner=instance
         )
+        
+@receiver(user_logged_in, sender=User)
+def something_useful_on_login(sender, request, user, **kwargs):
+    pass

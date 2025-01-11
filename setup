@@ -38,6 +38,14 @@ perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/asgi.py
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/settings.py
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/urls.py
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/wsgi.py
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app.dockerfile
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/package.json
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/pytest.ini
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/start
+perl -i -pe "s/example_project/$PROJECT_NAME/g" docker-compose.yml
+perl -i -pe "s/example_project/$PROJECT_NAME/g" deploy-aws-infra/pulumi/Pulumi.yaml
+perl -i -pe "s/example_project/$PROJECT_NAME/g" deploy-aws-infra/pulumi/Pulumi.dev.yaml 
+perl -i -pe "s/example_project/$PROJECT_NAME/g" deploy-aws-infra/pulumi/Pulumi.dev.yaml 
 
 mv app/example_project "app/$PROJECT_NAME"
 

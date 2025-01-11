@@ -36,7 +36,7 @@ def thing_create(request):
             thing.owner = request.user
             thing.save()
             messages.success(request, "Thing created successfully!")
-            return redirect('thing_detail', pk=thing.pk)
+            return redirect('main:thing_detail', pk=thing.pk)
     else:
         form = ThingForm()
     return render(request, 'main/thing_form.html', {'form': form})
@@ -49,7 +49,7 @@ def thing_edit(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Thing updated successfully!")
-            return redirect('thing_detail', pk=thing.pk)
+            return redirect('main:thing_detail', pk=thing.pk)
     else:
         form = ThingForm(instance=thing)
     return render(request, 'main/thing_form.html', {'form': form})
@@ -60,5 +60,5 @@ def thing_delete(request, pk):
     if request.method == 'POST':
         thing.delete()
         messages.success(request, "Thing deleted successfully!")
-        return redirect('thing_list')
+        return redirect('main:thing_list')
     return render(request, 'main/thing_confirm_delete.html', {'thing': thing})
