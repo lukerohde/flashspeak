@@ -2,7 +2,7 @@ import pytest
 from django.test import Client, TestCase
 from django.contrib.messages import get_messages
 from django.urls import reverse
-from .factories import UserFactory, CollectionFactory, MealFactory, MealPlanFactory, MembershipFactory
+from .factories import UserFactory, ThingFactory
 
 pytestmark = pytest.mark.django_db
 

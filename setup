@@ -34,10 +34,10 @@ echo "Please enter your project name (all one word): "
 read PROJECT_NAME
 echo "| $PROJECT_NAME |"
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/manage.py
-perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/asgi.py
-perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/settings.py
-perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/urls.py
-perl -i -pe "s/example_project/$PROJECT_NAME/g" app/example_project/wsgi.py
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/config/asgi.py
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/config/settings.py
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/config/urls.py
+perl -i -pe "s/example_project/$PROJECT_NAME/g" app/config/wsgi.py
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app.dockerfile
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/package.json
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/pytest.ini
@@ -46,8 +46,6 @@ perl -i -pe "s/example_project/$PROJECT_NAME/g" docker-compose.yml
 perl -i -pe "s/example_project/$PROJECT_NAME/g" deploy-aws-infra/pulumi/Pulumi.yaml
 perl -i -pe "s/example_project/$PROJECT_NAME/g" deploy-aws-infra/pulumi/Pulumi.dev.yaml 
 perl -i -pe "s/example_project/$PROJECT_NAME/g" deploy-aws-infra/pulumi/Pulumi.dev.yaml 
-
-mv app/example_project "app/$PROJECT_NAME"
 
 if [ ! -f docker-compose.override.yml ]; then
     read -p "Do you wish to setup for local dev using docker-compose.override.yml? (y/n): " answer

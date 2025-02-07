@@ -63,7 +63,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-ROOT_URLCONF = 'example_project.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -87,7 +87,7 @@ TEMPLATES = [
 #     dirs = engine['DIRS']
 #     logger.debug(f"Template DIRS: {dirs}")
 
-WSGI_APPLICATION = 'example_project.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -242,4 +242,4 @@ LOGGING = {
 #     }
 # }
 
-ACCOUNT_ADAPTER = 'example_project.account_adapter.InviteOnlyAccountAdapter'
+ACCOUNT_ADAPTER = 'config.account_adapter.InviteOnlyAccountAdapter'

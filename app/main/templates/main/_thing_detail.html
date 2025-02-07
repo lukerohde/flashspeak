@@ -1,5 +1,5 @@
 <div class="thing-detail d-flex justify-content-between align-items-center bg-white border rounded p-3">
-  <h1 class="mb-0"><a href="{% url 'main:thing_detail' thing.pk %}">{{ thing.name }}</a></h1>
+  <h2 class="mb-0"><a href="{% url 'main:thing_detail' thing.pk %}">{{ thing.name }}</a></h1>
   <div class="d-flex">
     <a href="{% url 'main:thing_edit' thing.pk %}" class="btn btn-warning me-2" title="Edit Thing">
       <i class="bi bi-pencil-square"></i>
