@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Voice Chat{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'voice_chat/css/index.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/@hotwired/stimulus@3.2.2/dist/stimulus.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100 p-0" data-controller="voice">
+  <div class="row h-100 g-0 px-3 pt-3">
+    <!-- Main Content Area -->
+    <div class="col-md-9 d-flex flex-column">
+      <!-- Transcript Area -->
+      <div id="transcript-container" class="transcript-container bg-white rounded border flex-grow-1 mb-3" data-voice-target="transcript">
+        <!-- Transcript content will appear here -->
+      </div>
+
+      <!-- Review Footer - Hidden until implemented -->
+      <div class="review-footer card d-none">
+        <div class="card-body">
+          <h5 class="card-title">Active Review</h5>
+          <p class="card-text text-muted">No active flashcard</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="offcanvas-md offcanvas-end col-md-3">
+      <div class="offcanvas-header d-md-none">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+      </div>
+      <div class="offcanvas-body p-md-3 pt-md-0 d-flex flex-column">
+        <div class="bg-white flex-grow-1 d-flex flex-column {% if request.user_agent.is_mobile %}{% else %}rounded border{% endif %}">
+          <!-- Microphone Controls -->
+          <div id="microphone-controls" class="p-3 pb-0">
+            <select class="form-select mb-2" id="micSelect">
+              <option value="">Select Microphone...</option>
+            </select>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-primary" data-voice-target="toggleMic">
+                <i class="bi bi-mic"></i> Toggle Mic
+              </button>
+              <button class="btn btn-outline-primary" data-voice-target="pushToTalk">
+                <i class="bi bi-hand-index-thumb"></i> Push to Talk
+              </button>
+            </div>
+          </div>
+
+          <!-- Categories/Decks - Hidden until implemented -->
+          <div class="p-3 d-none">
+            <h5>Categories</h5>
+            <div class="list-group">
+              <!-- Categories will be rendered here -->
+            </div>
+          </div>
+
+          <!-- Flashcards - Hidden until implemented -->
+          <div class="p-3 flex-grow-1 d-none">
+            <h5>Flashcards</h5>
+            <div class="list-group">
+              <!-- Flashcards will be rendered here -->
+            </div>
+          </div>
+
+          <!-- Logout Button -->
+          {% if user.is_authenticated %}
+          <div class="mt-auto p-3 border-top">
+            <a href="{% url 'account_logout' %}" class="btn btn-outline-secondary w-100">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </div>
+          {% else %}
+          <div class="mt-auto p-3 border-top">
+            <a href="{% url 'account_login' %}" class="btn btn-outline-secondary w-100">
+              <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

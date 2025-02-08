@@ -1,5 +1,5 @@
 """
-URL configuration for example_project.
+URL configuration for voice-anki.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -22,7 +22,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('', include('main.urls')),  # Assuming 'main' is the app for core functionality
+    path('thing/', include('main.urls')),
+    path('', include('voice_chat.urls')),
 ]
 
 if settings.DEBUG:

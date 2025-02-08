@@ -1,5 +1,5 @@
 """
-WSGI config for example_project.
+WSGI config for voice-anki.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

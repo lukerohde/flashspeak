@@ -1,5 +1,5 @@
 """
-ASGI config for example_project
+ASGI config for voice-anki
 .
 
 It exposes the ASGI callable as a module-level variable named ``application``.

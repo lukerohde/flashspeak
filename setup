@@ -5,9 +5,16 @@ generate_password() {
     echo $(perl -le 'print map { ("a".."z", "A".."Z", 0..9)[rand 62] } 1..32')
 }
 
+# Ask for project name
+echo "Please enter your project name (all one word): "
+read PROJECT_NAME
+echo "| $PROJECT_NAME |"
+
 # Check if .env file already exists
 if [ ! -f .env ]; then
     # Copy .env.example to .env
+    perl -i -pe "s/example_project/$PROJECT_NAME/g" .env.example
+
     cp .env.example .env
     rm -Rf .pg_data/ # any password previously set won't work now
     
@@ -29,10 +36,6 @@ else
     echo ".env file already exists, skipping env setup..."
 fi
 
-# Ask for project name
-echo "Please enter your project name (all one word): "
-read PROJECT_NAME
-echo "| $PROJECT_NAME |"
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/manage.py
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/config/asgi.py
 perl -i -pe "s/example_project/$PROJECT_NAME/g" app/config/settings.py
