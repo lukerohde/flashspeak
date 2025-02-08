@@ -40,6 +40,9 @@ export default class extends Controller {
 
   async initializeConnection() {
     try {
+      // Update state to connecting
+      this.walkieButtonTarget.setAttribute('data-state', 'connecting');
+      
       // Get session token first
       await this.getSessionToken();
       
@@ -48,8 +51,12 @@ export default class extends Controller {
       
       // Setup WebRTC with the session token
       await this.setupWebRTC();
+      
+      // Update state to connected
+      this.walkieButtonTarget.setAttribute('data-state', 'connected');
     } catch (error) {
-      this.updateStatus(`Error: ${error.message}`, 'error');
+      this.walkieButtonTarget.setAttribute('data-state', 'error');
+      this.updateStatus(`Error: ${error.message}. Click to retry.`, 'error');
     }
   }
 
@@ -308,6 +315,14 @@ export default class extends Controller {
 
   // Action methods for Stimulus
   // Action methods for Stimulus
+  handleClick(event) {
+    // If we're disconnected or in error state, try to reconnect
+    if (!this.isConnected) {
+      this.initializeConnection();
+      return;
+    }
+  }
+
   handleMouseDown(event) {
     if (!this.audioTrack || !this.isConnected) return;
     this.pressStartTime = Date.now();
@@ -364,11 +379,14 @@ export default class extends Controller {
     // Update button state
     if (this.hasWalkieButtonTarget) {
       this.walkieButtonTarget.setAttribute('data-muted', this.isMuted.toString());
-      // Add or remove active class based on mute state
+      const icon = this.walkieButtonTarget.querySelector('i');
+      
       if (this.isMuted) {
         this.walkieButtonTarget.classList.remove('active');
+        icon.className = 'bi bi-mic-mute';
       } else {
         this.walkieButtonTarget.classList.add('active');
+        icon.className = 'bi bi-mic';
       }
     }
     

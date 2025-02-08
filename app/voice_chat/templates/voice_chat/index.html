@@ -25,50 +25,48 @@
     transition: all 0.15s ease;
   }
 
-  /* Connection State Icons */
-  .voice-button .connection-icon {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-
-  .voice-button[data-state="disconnected"] .connection-icon[data-icon="disconnected"] {
-    opacity: 1;
-    transform: scale(1);
-    color: var(--bs-gray-600);
-  }
-
-  .voice-button[data-state="connecting"] .connection-icon[data-icon="connecting"] {
-    opacity: 1;
-    transform: scale(1);
-    color: var(--bs-warning);
-  }
-
-  .voice-button[data-state="connected"] .connection-icon[data-icon="connected"] {
-    opacity: 1;
-    transform: scale(1);
-    color: var(--bs-success);
-  }
-
-  .voice-button[data-state="error"] .connection-icon[data-icon="error"] {
-    opacity: 1;
-    transform: scale(1);
+  /* Button States */
+  .voice-button[data-state="disconnected"] i,
+  .voice-button[data-state="error"] i {
     color: var(--bs-danger);
   }
 
-  /* Mic State Icons */
-  .voice-button .mic-icon {
-    opacity: 0;
-    transform: scale(0.8);
+  .voice-button[data-state="connecting"] i {
+    /* Switch icon to telephone-outbound when connecting */
+    &::before {
+      content: "\F5BC"; /* bi-telephone-outbound */
+    }
+    color: var(--bs-warning);
   }
 
-  .voice-button[data-muted="true"] .mic-icon[data-icon="muted"] {
-    opacity: 1;
-    transform: scale(1);
+  .voice-button[data-state="connected"] i {
+    /* Switch icon to mic-mute when connected/muted */
+    &::before {
+      content: "\F48F"; /* bi-mic-mute */
+    }
+    color: var(--bs-gray-600);
   }
 
-  .voice-button[data-muted="false"] .mic-icon[data-icon="unmuted"] {
-    opacity: 1;
-    transform: scale(1);
+  .voice-button.active i {
+    /* Switch icon to regular mic when active/unmuted */
+    &::before {
+      content: "\F490"; /* bi-mic */
+    }
+    color: white;
+  }
+
+  /* Hover and active states */
+  .voice-button:hover {
+    transform: scale(1.05);
+  }
+
+  .voice-button:active {
+    transform: scale(0.95);
+  }
+
+  .voice-button.active {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
   }
 
   /* Active state */
@@ -147,19 +145,11 @@
             <!-- Voice Button -->
             <button class="voice-button" 
                     data-voice-chat-target="walkieButton"
-                    data-action="mousedown->voice-chat#handleMouseDown mouseup->voice-chat#handleMouseUp touchstart->voice-chat#handleTouchStart touchend->voice-chat#handleTouchEnd"
+                    data-action="mousedown->voice-chat#handleMouseDown mouseup->voice-chat#handleMouseUp touchstart->voice-chat#handleTouchStart touchend->voice-chat#handleTouchEnd click->voice-chat#handleClick"
                     data-state="disconnected"
                     data-muted="true"
                     title="Hold to talk or tap to toggle mute">
-              <!-- Connection State Icons -->
-              <i class="bi bi-telephone-x connection-icon" data-icon="disconnected"></i>
-              <i class="bi bi-telephone-outbound connection-icon" data-icon="connecting"></i>
-              <i class="bi bi-telephone connection-icon" data-icon="connected"></i>
-              <i class="bi bi-telephone-x connection-icon" data-icon="error"></i>
-              
-              <!-- Mic State Icons -->
-              <i class="bi bi-mic mic-icon" data-icon="unmuted"></i>
-              <i class="bi bi-mic-mute mic-icon" data-icon="muted"></i>
+              <i class="bi bi-telephone-x"></i>
             </button>
 
             <!-- Status Text -->
