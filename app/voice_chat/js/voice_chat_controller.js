@@ -584,15 +584,22 @@ export default class extends Controller {
     if (!this.audioTrack || !this.isConnected) return;
     
     this.isHolding = false;
-    // When releasing hold, respect the current mute state
-    this.audioTrack.enabled = !this.isMuted;
-    this.walkieButtonTarget.classList.remove('active');
     
     // Commit the audio buffer and create response
     this.commitAudioBuffer();
     this.createResponse();
     
-    this.updateStatus(this.isMuted ? 'Hold to talk or tap to toggle' : 'Channel open (tap to mute)', 'info');
+    // If we're unmuted, re-enable VAD and keep the UI in unmuted state
+    if (!this.isMuted) {
+      this.audioTrack.enabled = true;
+      this.enableVAD();
+      this.updateStatus('Channel open (tap to mute)', 'info');
+    } else {
+      // If muted, disable audio and update UI accordingly
+      this.audioTrack.enabled = false;
+      this.walkieButtonTarget.classList.remove('active');
+      this.updateStatus('Hold to talk or tap to toggle', 'info');
+    }
   }
 
   toggleMute() {
