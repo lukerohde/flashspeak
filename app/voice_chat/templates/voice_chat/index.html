@@ -1,10 +1,114 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Voice Chat{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'voice_chat/css/index.css' %}">
+<style>
+  .voice-button {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    position: relative;
+    border: 2px solid;
+    background: white;
+    cursor: pointer;
+  }
+
+  .voice-button i {
+    font-size: 1.5rem;
+    position: absolute;
+    transition: all 0.15s ease;
+  }
+
+  /* Connection State Icons */
+  .voice-button .connection-icon {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .voice-button[data-state="disconnected"] .connection-icon[data-icon="disconnected"] {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--bs-gray-600);
+  }
+
+  .voice-button[data-state="connecting"] .connection-icon[data-icon="connecting"] {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--bs-warning);
+  }
+
+  .voice-button[data-state="connected"] .connection-icon[data-icon="connected"] {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--bs-success);
+  }
+
+  .voice-button[data-state="error"] .connection-icon[data-icon="error"] {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--bs-danger);
+  }
+
+  /* Mic State Icons */
+  .voice-button .mic-icon {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .voice-button[data-muted="true"] .mic-icon[data-icon="muted"] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .voice-button[data-muted="false"] .mic-icon[data-icon="unmuted"] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Active state */
+  .voice-button.active {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+  }
+
+  .voice-button.active i {
+    color: white !important;
+  }
+
+  /* Hover effects */
+  .voice-button:hover {
+    transform: scale(1.05);
+  }
+
+  .voice-button:active {
+    transform: scale(0.95);
+  }
+
+  /* Status text */
+  .voice-status {
+    font-size: 0.875rem;
+    color: var(--bs-gray-600);
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+
+  /* Mic select styling */
+  .mic-select-container {
+    margin-bottom: 1rem;
+  }
+
+  .mic-select-container label {
+    font-size: 0.875rem;
+    color: var(--bs-gray-600);
+    margin-bottom: 0.25rem;
+  }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -12,12 +116,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid h-100 p-0" data-controller="voice">
+<div class="container-fluid h-100 p-0" data-controller="voice-chat" data-voice-chat-auto-connect-value="true">
   <div class="row h-100 g-0 px-3 pt-3">
     <!-- Main Content Area -->
     <div class="col-md-9 d-flex flex-column">
       <!-- Transcript Area -->
-      <div id="transcript-container" class="transcript-container bg-white rounded border flex-grow-1 mb-3" data-voice-target="transcript">
+      <div id="transcript-container" class="transcript-container bg-white rounded border flex-grow-1 mb-3" data-voice-chat-target="transcript">
         <!-- Transcript content will appear here -->
       </div>
 
@@ -39,17 +143,35 @@
       <div class="offcanvas-body p-md-3 pt-md-0 d-flex flex-column">
         <div class="bg-white flex-grow-1 d-flex flex-column {% if request.user_agent.is_mobile %}{% else %}rounded border{% endif %}">
           <!-- Microphone Controls -->
-          <div id="microphone-controls" class="p-3 pb-0">
-            <select class="form-select mb-2" id="micSelect">
-              <option value="">Select Microphone...</option>
-            </select>
-            <div class="d-grid gap-2">
-              <button class="btn btn-outline-primary" data-voice-target="toggleMic">
-                <i class="bi bi-mic"></i> Toggle Mic
-              </button>
-              <button class="btn btn-outline-primary" data-voice-target="pushToTalk">
-                <i class="bi bi-hand-index-thumb"></i> Push to Talk
-              </button>
+          <div id="microphone-controls" class="p-3 pb-0 d-flex flex-column align-items-center">
+            <!-- Voice Button -->
+            <button class="voice-button" 
+                    data-voice-chat-target="walkieButton"
+                    data-action="mousedown->voice-chat#handleMouseDown mouseup->voice-chat#handleMouseUp touchstart->voice-chat#handleTouchStart touchend->voice-chat#handleTouchEnd"
+                    data-state="disconnected"
+                    data-muted="true"
+                    title="Hold to talk or tap to toggle mute">
+              <!-- Connection State Icons -->
+              <i class="bi bi-telephone-x connection-icon" data-icon="disconnected"></i>
+              <i class="bi bi-telephone-outbound connection-icon" data-icon="connecting"></i>
+              <i class="bi bi-telephone connection-icon" data-icon="connected"></i>
+              <i class="bi bi-telephone-x connection-icon" data-icon="error"></i>
+              
+              <!-- Mic State Icons -->
+              <i class="bi bi-mic mic-icon" data-icon="unmuted"></i>
+              <i class="bi bi-mic-mute mic-icon" data-icon="muted"></i>
+            </button>
+
+            <!-- Status Text -->
+            <div class="voice-status" data-voice-chat-target="status">
+              Hold to talk or tap to toggle
+            </div>
+
+            <!-- Mic Selection (Collapsed by default on mobile) -->
+            <div class="mic-select-container w-100 mt-3 d-none d-md-block">
+              <select class="form-select form-select-sm" data-voice-chat-target="micSelect" data-action="change->voice-chat#switchMicrophone">
+                <option value="">Loading microphones...</option>
+              </select>
             </div>
           </div>
 

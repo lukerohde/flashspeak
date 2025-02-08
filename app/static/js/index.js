@@ -1,8 +1,7 @@
 import { Application } from '@hotwired/stimulus'
-import VoiceController from '../../voice_chat/js/voice_chat_controller'
+import VoiceChatController from '../../voice_chat/js/voice_chat_controller'
 
 console.log('Loading Stimulus application...')
-
 let application = null
 
 if (module.hot) {
@@ -30,7 +29,7 @@ if (!application) {
 }
 
 console.log('Registering controllers...')
-application.register('thing', ThingController)
+application.register('voice-chat', VoiceChatController)
 console.log('Controllers registered successfully')
 
 
