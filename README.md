@@ -13,7 +13,7 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - DONE Main content area with transcript (col-md-9)
   - DONE Footer area for active flashcard review
   - DONE OpenAI session creation endpoint
-  - Stimulus voice controller with auto-connect
+  - DONE Stimulus voice controller with auto-connect
 
 - As a learner, I want to see the conversation transcript in real-time
   - Independent scrolling for transcript and sidebar

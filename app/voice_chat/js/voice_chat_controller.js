@@ -88,6 +88,12 @@ export default class extends Controller {
         this.walkieButtonTarget.setAttribute('data-muted', 'true');
       }
       
+      // Set up track error handling
+      this.audioTrack.addEventListener('ended', () => this.handleTrackEnded());
+      
+      // Set up periodic track check
+      this.trackCheckInterval = setInterval(() => this.checkTrackStatus(), 1000);
+      
       await this.updateAudioDevices();
       this.updateStatus(`Using microphone: ${this.audioTrack.label}`, 'success');
       
@@ -96,6 +102,53 @@ export default class extends Controller {
     } catch (error) {
       throw new Error('Failed to access microphone: ' + error.message);
     }
+  }
+
+  handleTrackEnded() {
+    console.log('MediaStreamTrack ended');
+    this.handleMicrophoneFailure('Microphone disconnected');
+  }
+
+  checkTrackStatus() {
+    // Don't check during WebRTC setup
+    if (this.isSettingUpWebRTC) {
+      return;
+    }
+
+    // Only consider a track failed if:
+    // 1. We have no track, or
+    // 2. The track exists but its readyState is 'ended'
+    const track = this.microphoneStream?.getAudioTracks()[0];
+    if (!track || track.readyState === 'ended') {
+      console.log('MediaStreamTrack ended or not available:', 
+        track ? `readyState: ${track.readyState}` : 'no track');
+      this.handleMicrophoneFailure('Microphone disconnected');
+    }
+  }
+
+  handleMicrophoneFailure(reason) {
+    // Clear the check interval
+    if (this.trackCheckInterval) {
+      clearInterval(this.trackCheckInterval);
+      this.trackCheckInterval = null;
+    }
+
+    // Clean up the track
+    if (this.audioTrack) {
+      this.audioTrack.stop();
+      this.audioTrack = null;
+    }
+
+    if (this.microphoneStream) {
+      this.microphoneStream.getTracks().forEach(track => track.stop());
+      this.microphoneStream = null;
+    }
+
+    // Update UI
+    this.walkieButtonTarget.setAttribute('data-state', 'error');
+    this.walkieButtonTarget.classList.remove('active');
+    this.isConnected = false;
+    this.updateStatus(`${reason}. Click to reconnect.`, 'error');
   }
 
   setupPushToTalk() {
@@ -163,10 +216,17 @@ export default class extends Controller {
   }
 
   async setupWebRTC() {
+    this.isSettingUpWebRTC = true;
     try {
+      console.log('Start setupWebRTC - microphoneStream:', this.microphoneStream?.active);
       if (!this.ephemeralKey) {
         throw new Error('No session token available');
       }
+
+      if (!this.microphoneStream) {
+        throw new Error('No microphone stream available');
+      }
+      console.log('After initial check - microphoneStream:', this.microphoneStream?.active);
 
       this.updateStatus('Creating WebRTC connection...', 'info');
       this.pc = new RTCPeerConnection();
@@ -180,18 +240,19 @@ export default class extends Controller {
       };
 
       // Add microphone track
-      if (!this.microphoneStream) {
-        throw new Error('No microphone stream available');
-      }
+      console.log('Before addTrack - microphoneStream:', this.microphoneStream?.active);
       this.pc.addTrack(this.microphoneStream.getAudioTracks()[0], this.microphoneStream);
+      console.log('After addTrack - microphoneStream:', this.microphoneStream?.active);
 
       // Set up data channel
       this.dc = this.pc.createDataChannel('oai-events');
       this.setupDataChannelHandlers();
-
+      console.log('After createDataChannel - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
+      
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
-
+      console.log('After createOffer - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
+      
       // Connect to OpenAI's Realtime API
       this.updateStatus('Connecting to OpenAI...', 'info');
       const sdpResponse = await fetch(`${this.baseUrlValue}?model=${this.modelValue}`, {
@@ -206,7 +267,9 @@ export default class extends Controller {
       if (!sdpResponse.ok) {
         const error = await sdpResponse.json();
         throw new Error('Failed to connect to OpenAI: ' + error.error?.message || 'Unknown error');
-      }
+      } 
+      console.log('After sdpResponse - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
+      
 
       const answer = {
         type: 'answer',
@@ -219,13 +282,41 @@ export default class extends Controller {
         await this.waitForDataChannel();
       }
 
-      this.isConnected = true;
-      this.updateStatus('Connection established!', 'success');
+      if (!this.pc) {
+        throw new Error('No WebRTC connection available');
+      }
+
+      if (!this.dc) {
+        throw new Error('No data channel available');
+      }
+
+      if (this.dc.readyState !== 'open') {
+        throw new Error('Data channel not open');
+      }
+
+      console.log('Before final check - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
+      if (!this.microphoneStream) {
+        throw new Error('No microphone stream available');
+      }
+
+      // Only mark as connected if we have everything we need
+      if (this.pc && this.dc && this.dc.readyState === 'open' && this.microphoneStream) {
+        this.isConnected = true;
+        this.walkieButtonTarget.setAttribute('data-state', 'connected');
+        this.updateStatus('Connection established!', 'success');
+      } else {
+        throw new Error('Connection incomplete');
+      }
     } catch (error) {
       console.error('Error setting up WebRTC:', error);
+      this.isConnected = false;
+      this.walkieButtonTarget.setAttribute('data-state', 'error');
       this.updateStatus(`Error: ${error.message}`, 'error');
       this.closeConnection();
+      this.isSettingUpWebRTC = false;
       throw error;
+    } finally {
+      this.isSettingUpWebRTC = false;
     }
   }
 
@@ -284,6 +375,11 @@ export default class extends Controller {
       this.pc = null;
     }
 
+    if (this.trackCheckInterval) {
+      clearInterval(this.trackCheckInterval);
+      this.trackCheckInterval = null;
+    }
+
     if (this.microphoneStream) {
       this.microphoneStream.getTracks().forEach(track => track.stop());
       this.microphoneStream = null;
@@ -303,6 +399,13 @@ export default class extends Controller {
 
     this.isConnected = false;
     this.ephemeralKey = null;
+    
+    // Reset icon to disconnected state
+    if (this.hasWalkieButtonTarget) {
+      this.walkieButtonTarget.setAttribute('data-state', 'disconnected');
+      this.walkieButtonTarget.classList.remove('active');
+    }
+    
     this.updateStatus('Connection closed', 'info');
   }
 
