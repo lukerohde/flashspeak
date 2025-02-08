@@ -36,7 +36,6 @@ class SessionAPIView(APIView):
                 'output_audio_format': 'pcm16',
                 "input_audio_transcription": {
                    "model": "whisper-1",
-                   "language": "ja"
                 }, 
                 'temperature': 0.8
             }

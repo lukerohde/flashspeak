@@ -23,13 +23,23 @@ export default class extends Controller {
   handleUserTranscript(event) {
     const message = this.createMessageElement('user', event.detail.transcript)
     this.containerTarget.appendChild(message)
+
+    // If there's an in-progress AI message, move it after this user message
+    if (this.streamingTranscript.parentElement) {
+      const aiMessage = this.streamingTranscript.parentElement.closest('.message')
+      if (aiMessage) {
+        this.containerTarget.appendChild(aiMessage)
+      }
+    }
+
     this.scrollToBottom()
   }
 
   handleAITranscriptDelta(event) {
     if (!this.streamingTranscript.parentElement) {
       const message = this.createMessageElement('ai', '')
-      message.appendChild(this.streamingTranscript)
+      const contentEl = message.querySelector('.message-content')
+      contentEl.appendChild(this.streamingTranscript)
       this.containerTarget.appendChild(message)
     }
     this.streamingTranscript.textContent += event.detail.delta
@@ -37,14 +47,17 @@ export default class extends Controller {
   }
 
   handleAITranscriptDone(event) {
-    // Remove streaming transcript element
     if (this.streamingTranscript.parentElement) {
-      this.streamingTranscript.parentElement.remove()
+      // Update the content of the existing message instead of creating a new one
+      const contentEl = this.streamingTranscript.parentElement
+      contentEl.textContent = event.detail.transcript
+      this.streamingTranscript = document.createElement('div')
+      this.streamingTranscript.classList.add('streaming-transcript')
+    } else {
+      // Fallback: create a new message if no streaming transcript exists
+      const message = this.createMessageElement('ai', event.detail.transcript)
+      this.containerTarget.appendChild(message)
     }
-    
-    // Add final message
-    const message = this.createMessageElement('ai', event.detail.transcript)
-    this.containerTarget.appendChild(message)
     this.scrollToBottom()
   }
 
@@ -52,15 +65,10 @@ export default class extends Controller {
     const messageEl = document.createElement('div')
     messageEl.classList.add('message', `message-${role}`)
     
-    const avatarEl = document.createElement('div')
-    avatarEl.classList.add('message-avatar')
-    avatarEl.innerHTML = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>'
-    
     const contentEl = document.createElement('div')
     contentEl.classList.add('message-content')
     contentEl.textContent = content
     
-    messageEl.appendChild(avatarEl)
     messageEl.appendChild(contentEl)
     
     return messageEl
