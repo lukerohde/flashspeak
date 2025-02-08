@@ -31,11 +31,6 @@
   color: #333;
 }
 
-.message-user .message-content {
-  background: #007AFF;
-  color: white;
-}
-
 .streaming-transcript {
   opacity: 0.7;
   font-style: italic;

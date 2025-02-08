@@ -9,6 +9,15 @@ export default class extends Controller {
     model: { type: String, default: 'gpt-4o-realtime-preview-2024-12-17' }
   }
 
+  sendEvent(event) {
+    console.log('Sending event:', event);
+    if (this.dc) {
+      this.dc.send(JSON.stringify(event));
+    } else {
+      console.warn('Data channel not available');
+    }
+  }
+
   initialize() {
     this.pc = null;
     this.dc = null;
@@ -463,12 +472,60 @@ export default class extends Controller {
     event.preventDefault();
   }
 
+  enableVAD() {
+    const sessionUpdate = {
+      type: "session.update",
+      session: {
+        turn_detection: {
+          type: "server_vad",
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 500,
+          create_response: true
+        }
+      }
+    };
+    this.sendEvent(sessionUpdate);
+  }
+
+  disableVAD() {
+    const sessionUpdate = {
+      type: "session.update",
+      session: {
+        turn_detection: null
+      }
+    };
+    this.sendEvent(sessionUpdate);
+  }
+
+  commitAudioBuffer() {
+    const commit = {
+      type: "input_audio_buffer.commit"
+    };
+    this.sendEvent(commit);
+  }
+
+  createResponse() {
+    const response = {
+      type: "response.create"
+    };
+    this.sendEvent(response);
+  }
+
+  clearAudioBuffer() {
+    const clear = {
+      type: "input_audio_buffer.clear"
+    };
+    this.sendEvent(clear);
+  }
+
   startTalking() {
     if (!this.audioTrack || !this.isConnected) return;
     
     this.isHolding = true;
     this.audioTrack.enabled = true;
     this.walkieButtonTarget.classList.add('active');
+    this.disableVAD();
     this.updateStatus('Listening...', 'info');
   }
 
@@ -479,6 +536,11 @@ export default class extends Controller {
     // When releasing hold, respect the current mute state
     this.audioTrack.enabled = !this.isMuted;
     this.walkieButtonTarget.classList.remove('active');
+    
+    // Commit the audio buffer and create response
+    this.commitAudioBuffer();
+    this.createResponse();
+    
     this.updateStatus(this.isMuted ? 'Hold to talk or tap to toggle' : 'Channel open (tap to mute)', 'info');
   }
 
@@ -486,7 +548,7 @@ export default class extends Controller {
     if (!this.audioTrack || !this.isConnected) return;
     
     this.isMuted = !this.isMuted;
-    this.audioTrack.enabled = !this.isMuted;
+    //this.audioTrack.enabled = !this.isMuted;
     
     // Update button state
     if (this.hasWalkieButtonTarget) {
@@ -494,11 +556,18 @@ export default class extends Controller {
       const icon = this.walkieButtonTarget.querySelector('i');
       
       if (this.isMuted) {
+        this.audioTrack.enabled = false;
         this.walkieButtonTarget.classList.remove('active');
         icon.className = 'bi bi-mic-mute';
       } else {
+        this.audioTrack.enabled = true;
         this.walkieButtonTarget.classList.add('active');
         icon.className = 'bi bi-mic';
+        // When unmuting and not in push-to-talk mode
+        this.clearAudioBuffer();  
+        if (!this.isHolding) {
+          this.enableVAD();
+        }
       }
     }
     

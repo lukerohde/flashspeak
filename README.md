@@ -16,16 +16,16 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - DONE Stimulus voice controller with auto-connect
 
 - As a learner, I want to see the conversation transcript in real-time
-  - Independent scrolling for transcript and sidebar
-  - Auto-scroll for new transcript entries
-  - Server-rendered transcript updates
+  - DONE Independent scrolling for transcript 
+  - DONE Auto-scroll for new transcript entries
+  - DONE Server-rendered transcript updates
 
 - As a user, I want flexible microphone controls:
-  - Click to toggle mute/unmute
-  - Push-to-talk (walkie-talkie mode)
-  - Voice activity detection (VAD) when unmute
-  - WebRTC audio streaming setup
-  - Microphone input selection
+  - DONE WebRTC audio streaming setup
+  - DONE Click to toggle mute/unmute
+  - DONE Push-to-talk (walkie-talkie mode)
+  - UNTESTED Microphone input selection
+  - Disable Voice activity detection (VAD) when in walkie-talkie mode
 
 ### Flashcard Creation
 - As a learner, I want to create flashcards directly from our conversation
