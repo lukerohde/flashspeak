@@ -8,9 +8,10 @@
     <!-- Main Content Area -->
     <div class="col-md-9 d-flex flex-column">
       <!-- Transcript Area -->
-      <div id="transcript-container" data-controller="transcript" class="transcript-container bg-white rounded border flex-grow-1" data-transcript-target="container">
+      <div id="transcript-container" data-controller="transcript" class="transcript-container bg-white rounded border flex-grow-1 mb-3" data-transcript-target="container">
         <!-- Transcript content will appear here -->
       </div>
+      {% include 'voice_chat/_message.html' %}
 
       <!-- Review Footer - Hidden until implemented -->
       <div class="review-footer card d-none">

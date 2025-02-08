@@ -62,14 +62,12 @@ export default class extends Controller {
   }
 
   createMessageElement(role, content) {
-    const messageEl = document.createElement('div')
-    messageEl.classList.add('message', `message-${role}`)
+    const template = document.getElementById('message-template')
+    const messageEl = template.content.cloneNode(true).querySelector('.message')
+    messageEl.classList.add(`message-${role}`)
     
-    const contentEl = document.createElement('div')
-    contentEl.classList.add('message-content')
+    const contentEl = messageEl.querySelector('.message-content')
     contentEl.textContent = content
-    
-    messageEl.appendChild(contentEl)
     
     return messageEl
   }

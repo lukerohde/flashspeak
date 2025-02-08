@@ -1,8 +1,11 @@
 /* Transcript */
 .transcript-container {
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     padding: 1rem;
-    min-height: 0; /* Required for proper flex behavior */
+    height: 100%;
+    overflow-y: auto;
+    /*max-height: calc(100vh - 120px);*/
 }
 
 /* Desktop Sidebar */
@@ -23,11 +26,7 @@
     }
 }
 
-/* Transcript */
-.transcript-container {
-    overflow-y: auto;
-    min-height: 0; /* Required for proper flex behavior */
-}
+
 
 /* Mobile Sidebar */
 @media (max-width: 768px) {
