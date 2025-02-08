@@ -1,6 +1,6 @@
 
 @import "../../voice_chat/css/voice_chat.css";
-
+@import "../../voice_chat/css/transcript.css";
 /* Base variables */
 :root {
   --primary-color: #17a2b8;

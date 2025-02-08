@@ -218,7 +218,6 @@ export default class extends Controller {
   async setupWebRTC() {
     this.isSettingUpWebRTC = true;
     try {
-      console.log('Start setupWebRTC - microphoneStream:', this.microphoneStream?.active);
       if (!this.ephemeralKey) {
         throw new Error('No session token available');
       }
@@ -226,8 +225,7 @@ export default class extends Controller {
       if (!this.microphoneStream) {
         throw new Error('No microphone stream available');
       }
-      console.log('After initial check - microphoneStream:', this.microphoneStream?.active);
-
+      
       this.updateStatus('Creating WebRTC connection...', 'info');
       this.pc = new RTCPeerConnection();
 
@@ -240,18 +238,14 @@ export default class extends Controller {
       };
 
       // Add microphone track
-      console.log('Before addTrack - microphoneStream:', this.microphoneStream?.active);
       this.pc.addTrack(this.microphoneStream.getAudioTracks()[0], this.microphoneStream);
-      console.log('After addTrack - microphoneStream:', this.microphoneStream?.active);
-
+      
       // Set up data channel
       this.dc = this.pc.createDataChannel('oai-events');
       this.setupDataChannelHandlers();
-      console.log('After createDataChannel - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
       
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
-      console.log('After createOffer - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
       
       // Connect to OpenAI's Realtime API
       this.updateStatus('Connecting to OpenAI...', 'info');
@@ -268,9 +262,7 @@ export default class extends Controller {
         const error = await sdpResponse.json();
         throw new Error('Failed to connect to OpenAI: ' + error.error?.message || 'Unknown error');
       } 
-      console.log('After sdpResponse - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
       
-
       const answer = {
         type: 'answer',
         sdp: await sdpResponse.text(),
@@ -294,7 +286,6 @@ export default class extends Controller {
         throw new Error('Data channel not open');
       }
 
-      console.log('Before final check - microphoneStream:', this.microphoneStream?.active, 'tracks:', this.microphoneStream?.getTracks().map(t => ({enabled: t.enabled, muted: t.muted, readyState: t.readyState})));
       if (!this.microphoneStream) {
         throw new Error('No microphone stream available');
       }
@@ -356,7 +347,25 @@ export default class extends Controller {
 
   handleMessage(event) {
     const message = JSON.parse(event.data);
-    // Dispatch a custom event that other controllers can listen to
+
+    // Dispatch events for transcript updates
+    if (message.type === 'conversation.item.input_audio_transcription.completed') {
+      document.dispatchEvent(new CustomEvent('voice-chat:user-transcript', {
+        detail: { transcript: message.transcript }
+      }));
+    } 
+    else if (message.type === 'response.audio_transcript.delta') {
+      document.dispatchEvent(new CustomEvent('voice-chat:ai-transcript-delta', {
+        detail: { delta: message.delta }
+      }));
+    }
+    else if (message.type === 'response.audio_transcript.done') {
+      document.dispatchEvent(new CustomEvent('voice-chat:ai-transcript-done', {
+        detail: { transcript: message.transcript }
+      }));
+    }
+
+    // Also dispatch the raw message for other controllers
     const customEvent = new CustomEvent('voice-chat-message', {
       detail: message,
       bubbles: true
