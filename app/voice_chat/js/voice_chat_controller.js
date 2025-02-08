@@ -19,6 +19,8 @@ export default class extends Controller {
   }
 
   initialize() {
+    this.holdTimer = null;
+    this.pushTalkActive = false;
     this.pc = null;
     this.dc = null;
     this.audioEl = null;
@@ -163,22 +165,43 @@ export default class extends Controller {
   setupPushToTalk() {
     // Space bar handlers
     const keydownHandler = (e) => {
-      if (e.code === 'Space' && !e.repeat && this.audioTrack && !this.isHolding) {
+      if (e.code === 'Space' && !e.repeat && this.audioTrack) {
         e.preventDefault();
         this.pressStartTime = Date.now();
-        this.startTalking();
+        
+        // Clear any existing timer
+        if (this.holdTimer) {
+          clearTimeout(this.holdTimer);
+        }
+        
+        // Set timer for push-to-talk
+        this.holdTimer = setTimeout(() => {
+          if (this.audioTrack) {
+            this.pushTalkActive = true;
+            this.startTalking();
+          }
+        }, this.holdThreshold);
       }
     };
 
     const keyupHandler = (e) => {
       if (e.code === 'Space' && this.audioTrack) {
         e.preventDefault();
+        
+        // Clear the hold timer
+        if (this.holdTimer) {
+          clearTimeout(this.holdTimer);
+          this.holdTimer = null;
+        }
+        
         const pressDuration = Date.now() - this.pressStartTime;
         
-        this.stopTalking();
-        
-        // If it was a short press, treat it as a toggle
-        if (pressDuration < this.holdThreshold) {
+        if (this.pushTalkActive) {
+          // Was in push-to-talk mode
+          this.stopTalking();
+          this.pushTalkActive = false;
+        } else if (pressDuration < this.holdThreshold) {
+          // Short press - toggle mute
           this.toggleMute();
         }
       }
@@ -383,6 +406,13 @@ export default class extends Controller {
   }
 
   closeConnection() {
+    // Clear any existing hold timer
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+    this.pushTalkActive = false;
+
     if (this.dc) {
       this.dc.close();
       this.dc = null;
@@ -447,17 +477,38 @@ export default class extends Controller {
   handleMouseDown(event) {
     if (!this.audioTrack || !this.isConnected) return;
     this.pressStartTime = Date.now();
-    this.startTalking();
+    
+    // Clear any existing timer
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+    }
+    
+    // Set timer for push-to-talk
+    this.holdTimer = setTimeout(() => {
+      if (this.audioTrack) {
+        this.pushTalkActive = true;
+        this.startTalking();
+      }
+    }, this.holdThreshold);
   }
 
   handleMouseUp(event) {
     if (!this.audioTrack || !this.isConnected) return;
+    
+    // Clear the hold timer
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+    
     const pressDuration = Date.now() - this.pressStartTime;
     
-    this.stopTalking();
-    
-    // If it was a short press, treat it as a toggle
-    if (pressDuration < this.holdThreshold) {
+    if (this.pushTalkActive) {
+      // Was in push-to-talk mode
+      this.stopTalking();
+      this.pushTalkActive = false;
+    } else if (pressDuration < this.holdThreshold) {
+      // Short press - toggle mute
       this.toggleMute();
     }
   }
