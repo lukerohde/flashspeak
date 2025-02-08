@@ -9,7 +9,7 @@ A Django-based language learning application that combines the power of spaced r
   - DONE Bootstrap-based responsive layout with main content and sidebar
   - DONE Sliding sidebar on mobile, fixed on desktop (col-md-3)
   - DONE Main content area with transcript (col-md-9)
-  - Footer area for active flashcard review
+  - DONE Footer area for active flashcard review
   - OpenAI session creation endpoint
   - Stimulus voice controller with auto-connect
 
