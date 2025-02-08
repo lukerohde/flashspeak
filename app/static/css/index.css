@@ -1,5 +1,6 @@
 
-@import "../../voice_chat/css/voice_chat.css";
+@import "../../voice_chat/css/voice_chat_layout.css";
+@import "../../voice_chat/css/voice_chat_microphone.css";
 @import "../../voice_chat/css/transcript.css";
 /* Base variables */
 :root {

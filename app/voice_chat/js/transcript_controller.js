@@ -29,7 +29,7 @@ export default class extends Controller {
   handleAITranscriptDelta(event) {
     if (!this.streamingTranscript.parentElement) {
       const message = this.createMessageElement('ai', '')
-      //message.appendChild(this.streamingTranscript)
+      message.appendChild(this.streamingTranscript)
       this.containerTarget.appendChild(message)
     }
     this.streamingTranscript.textContent += event.detail.delta
@@ -44,7 +44,7 @@ export default class extends Controller {
     
     // Add final message
     const message = this.createMessageElement('ai', event.detail.transcript)
-    //this.containerTarget.appendChild(message)
+    this.containerTarget.appendChild(message)
     this.scrollToBottom()
   }
 
