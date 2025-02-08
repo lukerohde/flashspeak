@@ -1,5 +1,5 @@
 import { Application } from '@hotwired/stimulus'
-import ThingController from '../../main/js/controllers/thing_controller'
+import VoiceController from '../../voice_chat/js/voice_chat_controller'
 
 console.log('Loading Stimulus application...')
 

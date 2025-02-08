@@ -4,13 +4,15 @@ A Django-based language learning application that combines the power of spaced r
 
 ## MVP Features & User Stories (Japanese)
 
+We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app in /Users/lrohde/voice-anki/app.
+
 ### Voice Chat with AI Tutor
 - As a language learner, I want to practice speaking Japanese with an AI tutor
   - DONE Bootstrap-based responsive layout with main content and sidebar
   - DONE Sliding sidebar on mobile, fixed on desktop (col-md-3)
   - DONE Main content area with transcript (col-md-9)
   - DONE Footer area for active flashcard review
-  - OpenAI session creation endpoint
+  - DONE OpenAI session creation endpoint
   - Stimulus voice controller with auto-connect
 
 - As a learner, I want to see the conversation transcript in real-time
@@ -88,67 +90,6 @@ A Django-based language learning application that combines the power of spaced r
    - Footer area for active flashcard review
    - Independent scrolling for transcript and sidebar
    - Auto-scroll for new transcript entries
-
-2. Voice Chat Controller (Stimulus)
-   ```javascript
-   // voice_controller.js
-   export default class extends Controller {
-     static targets = ['transcript']
-     static values = {
-       sessionUrl: String
-     }
-
-     async connect() {
-       await this.initializeSession()
-       await this.setupWebRTC()
-     }
-   }
-   ```
-
-3. API Endpoints
-   ```python
-   # views.py
-   @api_view(['POST'])
-   def create_session(request):
-       """Create OpenAI session and return ephemeral key"""
-       # Configure OpenAI session with Japanese tutor prompt
-       # Return ephemeral key for WebRTC
-   ```
-
-4. HTML Structure
-   ```html
-   <div class="container-fluid" data-controller="voice">
-     <div class="row">
-       <!-- Main Content -->
-       <div class="col-md-9 main-content">
-         <div class="transcript" data-voice-target="transcript">
-         </div>
-         <div class="review-footer">
-           <!-- Active flashcard -->
-         </div>
-       </div>
-       
-       <!-- Sidebar -->
-       <div class="col-md-3 sidebar">
-         <!-- Categories & Flashcards -->
-       </div>
-     </div>
-   </div>
-   ```
-
-### Core Components
-
-1. Voice Chat Module (Reusable Component)
-   - WebRTC audio streaming
-   - OpenAI integration
-   - Configurable microphone controls
-   - Real-time transcript display
-
-2. Flashcard System
-   - Server-side rendered components
-   - Category management
-   - SM-2 algorithm implementation
-   - Review scheduling and tracking
 
 ### Technical Architecture
 - Server-side rendering with Django templates
