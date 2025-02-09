@@ -2,6 +2,7 @@
 import factory
 from django.contrib.auth.models import User
 from main.models import Thing
+from flashcards.models import FlashCard
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -26,3 +27,13 @@ class ThingFactory(factory.django.DjangoModelFactory):
     
     owner = factory.SubFactory(UserFactory)
     name = factory.Sequence(lambda n: f"Thing {n}")
+
+
+class FlashCardFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FlashCard
+    
+    user = factory.SubFactory(UserFactory)
+    front = factory.Sequence(lambda n: f"Front of card {n}")
+    back = factory.Sequence(lambda n: f"Back of card {n}")
+    tags = factory.List([factory.Sequence(lambda n: f"tag{n}")])

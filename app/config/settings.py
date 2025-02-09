@@ -49,8 +49,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',  # Example provider
     'whitenoise.runserver_nostatic', # disable django static file serving so whitenoise can work
+    'rest_framework',
     'main',
     'voice_chat',
+    'flashcards',
 ]
 
 MIDDLEWARE = [

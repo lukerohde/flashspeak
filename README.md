@@ -24,8 +24,9 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - DONE WebRTC audio streaming setup
   - DONE Click to toggle mute/unmute
   - DONE Push-to-talk (walkie-talkie mode)
+  - DONE Push-to-talk when not on hold disables the VAD temporarily for that response
   - UNTESTED Microphone input selection
-  - Disable Voice activity detection (VAD) when in walkie-talkie mode
+  - DONE Disable Voice activity detection (VAD) when in walkie-talkie mode
 
 ### Flashcard Creation
 - As a learner, I want to create flashcards directly from our conversation
