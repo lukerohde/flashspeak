@@ -9,6 +9,26 @@ export default class extends Controller {
     model: { type: String, default: 'gpt-4o-realtime-preview-2024-12-17' }
   }
 
+  registeredTools = []
+
+  registerTool(tool) {
+    this.registeredTools.push(tool)
+    if (this.isConnected && this.dc) {
+      this.updateTools()
+    }
+  }
+
+  updateTools() {
+    const toolsUpdate = {
+      type: 'session.update',
+      session: {
+        tools: this.registeredTools,
+        tool_choice: 'auto'
+      }
+    }
+    this.sendEvent(toolsUpdate)
+  }
+
   sendEvent(event) {
     console.log('Sending event:', event);
     if (this.dc) {
@@ -65,6 +85,11 @@ export default class extends Controller {
       
       // Update state to connected
       this.walkieButtonTarget.setAttribute('data-state', 'connected');
+
+      // Send registered tools if any exist
+      if (this.registeredTools.length > 0) {
+        this.updateTools();
+      }
     } catch (error) {
       this.walkieButtonTarget.setAttribute('data-state', 'error');
       this.updateStatus(`Error: ${error.message}. Click to retry.`, 'error');
@@ -73,7 +98,9 @@ export default class extends Controller {
 
   async getSessionToken() {
     this.updateStatus('Getting session token...', 'info');
-    const response = await fetch('/api/session/');
+    const response = await fetch('/api/session/', {
+      credentials: 'same-origin'
+    });
     const data = await response.json();
     
     if (data.error) {
@@ -380,22 +407,53 @@ export default class extends Controller {
   handleMessage(event) {
     const message = JSON.parse(event.data);
 
-    // Dispatch events for transcript updates
-    if (message.type === 'conversation.item.input_audio_transcription.completed') {
-      document.dispatchEvent(new CustomEvent('voice-chat:user-transcript', {
-        detail: { transcript: message.transcript }
-      }));
-    } 
-    else if (message.type === 'response.audio_transcript.delta') {
-      document.dispatchEvent(new CustomEvent('voice-chat:ai-transcript-delta', {
-        detail: { delta: message.delta }
-      }));
-    }
-    else if (message.type === 'response.audio_transcript.done') {
-      document.dispatchEvent(new CustomEvent('voice-chat:ai-transcript-done', {
-        detail: { transcript: message.transcript }
-      }));
-    }
+    // Handle different message types
+    switch (message.type) {
+      case 'conversation.item.input_audio_transcription.completed':
+        document.dispatchEvent(new CustomEvent('voice-chat:user-transcript', {
+          detail: { transcript: message.transcript }
+        }));
+        break;
+
+      case 'response.audio_transcript.delta':
+        document.dispatchEvent(new CustomEvent('voice-chat:ai-transcript-delta', {
+          detail: { delta: message.delta }
+        }));
+        break;
+
+      case 'response.audio_transcript.done':
+        document.dispatchEvent(new CustomEvent('voice-chat:ai-transcript-done', {
+          detail: { transcript: message.transcript }
+        }));
+        break;
+
+      case 'response.done':
+      case 'response.function_call_arguments.done':
+        // Handle function calls in the response
+        console.log(message)
+        if (message.response && message.response.output) {
+          message.response.output.forEach(item => {
+            if (item.type === 'function_call' && item.status === 'completed') {
+              this.dispatch('function-call', {
+                detail: {
+                  name: item.name,
+                  arguments: JSON.parse(item.arguments),
+                  callId: item.call_id
+                }
+              });
+            }
+          });
+        }
+        break;
+
+      case 'error':
+        this.updateStatus(`Error: ${message.error}`, 'error');
+        break;
+
+      default:
+        console.log('Unhandled message type:', message.type);
+  }
+
 
     // Also dispatch the raw message for other controllers
     const customEvent = new CustomEvent('voice-chat-message', {

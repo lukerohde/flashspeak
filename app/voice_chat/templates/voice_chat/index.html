@@ -20,6 +20,20 @@
           <p class="card-text text-muted">No active flashcard</p>
         </div>
       </div>
+
+      <div data-controller="flashcard" 
+           data-flashcard-voice-chat-id-value="voice-chat"
+           data-action="voice-chat:function-call@window->flashcard#handleFunctionCall">
+        <div data-flashcard-target="container">
+          <!-- flashcards will be added here -->
+          <div class="review-footer card d-none">
+            <div class="card-body">
+              <h5 class="card-title">Active Review</h5>
+              <p class="card-text text-muted">No active flashcard</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Sidebar -->
