@@ -1,10 +1,8 @@
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from flashcards.models import FlashCard
 
-class VoiceChatView(LoginRequiredMixin, TemplateView):
-    template_name = 'voice_chat/index.html'
-    login_url = '/accounts/login/'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+@login_required(login_url='/accounts/login/')
+def voice_chat_view(request):
+    flashcards = FlashCard.objects.filter(user=request.user)
+    return render(request, 'voice_chat/index.html', {'flashcards': flashcards})

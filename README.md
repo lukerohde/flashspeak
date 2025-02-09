@@ -65,7 +65,7 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - Dynamic review queue updates
   - Review statistics by category
 
-- As a learner, I want to track my review progress
+- As a learner, I want to track my review pro gress
   - Review history tracking
   - Progress visualization
   - Statistics calculation endpoints

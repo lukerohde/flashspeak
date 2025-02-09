@@ -1,10 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["container"]
-  static values = {
-    voiceChatId: String
-  }
+  static targets = ["previewContainer", "reviewContainer"]
 
   connect() {
     this.registerFlashcardTool()
@@ -14,19 +11,6 @@ export default class extends Controller {
   }
 
   registerFlashcardTool() {
-    // Get the voice chat controller using Stimulus
-    const voiceChatElement = document.querySelector(`[data-controller="voice-chat"]`)
-    if (!voiceChatElement) {
-      console.error('Voice chat element not found')
-      return
-    }
-
-    const voiceChatController = this.application.getControllerForElementAndIdentifier(voiceChatElement, 'voice-chat')
-    if (!voiceChatController) {
-      console.error('Voice chat controller not found')
-      return
-    }
-
     const flashcardTool = {
       type: 'function',
       name: 'create_flashcard',
@@ -54,7 +38,7 @@ export default class extends Controller {
       }
     }
 
-    voiceChatController.registerTool(flashcardTool)
+    this.dispatch('register-tool', { detail: flashcardTool })
   }
 
   async handleFunctionCall(event) {
@@ -90,6 +74,7 @@ export default class extends Controller {
         }
 
         const flashcard = await response.json()
+        console.log(flashcard)
         this.appendFlashcard(flashcard)
       } catch (error) {
         console.error('Error creating flashcard:', error)
@@ -98,14 +83,9 @@ export default class extends Controller {
   }
 
   appendFlashcard(flashcard) {
-    // Create and append the flashcard element to the container
-    const flashcardElement = document.createElement('div')
-    flashcardElement.classList.add('flashcard')
-    flashcardElement.innerHTML = `
-      <div class="flashcard-front">${flashcard.front}</div>
-      <div class="flashcard-back">${flashcard.back}</div>
-      ${flashcard.tags.length ? `<div class="flashcard-tags">${flashcard.tags.join(', ')}</div>` : ''}
-    `
-    this.containerTarget.appendChild(flashcardElement)
+    if (flashcard) {
+      // Prepend the new flashcards to the preview container
+      this.previewContainerTarget.insertAdjacentHTML('afterbegin', flashcard.html);
+    }
   }
 }

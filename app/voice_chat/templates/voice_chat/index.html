@@ -3,7 +3,7 @@
 {% block title %}Voice Chat{% endblock %}
 
 {% block content %}
-<div class="container-fluid h-100 p-0" data-controller="voice-chat" data-voice-chat-auto-connect-value="true">
+<div class="container-fluid h-100 p-0" data-controller="voice-chat flashcard" data-voice-chat-auto-connect-value="true" data-action="voice-chat:function-call->flashcard#handleFunctionCall flashcard:register-tool->voice-chat#registerTool">
   <div class="row h-100 g-0 px-3 pt-3">
     <!-- Main Content Area -->
     <div class="col-md-9 d-flex flex-column">
@@ -13,24 +13,13 @@
       </div>
       {% include 'voice_chat/_message.html' %}
 
-      <!-- Review Footer - Hidden until implemented -->
-      <div class="review-footer card d-none">
-        <div class="card-body">
-          <h5 class="card-title">Active Review</h5>
-          <p class="card-text text-muted">No active flashcard</p>
-        </div>
-      </div>
-
-      <div data-controller="flashcard" 
-           data-flashcard-voice-chat-id-value="voice-chat"
-           data-action="voice-chat:function-call@window->flashcard#handleFunctionCall">
-        <div data-flashcard-target="container">
-          <!-- flashcards will be added here -->
-          <div class="review-footer card d-none">
-            <div class="card-body">
-              <h5 class="card-title">Active Review</h5>
-              <p class="card-text text-muted">No active flashcard</p>
-            </div>
+      <!-- Review Area -->
+      <div data-flashcard-target="reviewContainer" class="review-area d-none">
+        <!-- Active flashcard for review will be shown here -->
+        <div class="review-footer card">
+          <div class="card-body">
+            <h5 class="card-title">Active Review</h5>
+            <p class="card-text text-muted">No active flashcard</p>
           </div>
         </div>
       </div>
@@ -76,13 +65,14 @@
               <!-- Categories will be rendered here -->
             </div>
           </div>
-
-          <!-- Flashcards - Hidden until implemented -->
-          <div class="p-3 flex-grow-1 d-none">
-            <h5>Flashcards</h5>
-            <div class="list-group">
-              <!-- Flashcards will be rendered here -->
-            </div>
+          
+          <h5>Flashcards</h5>
+          <div class="flashcard-previews p-3 flex-grow-1 overflow-auto" data-flashcard-target="previewContainer">
+              {% for flashcard in flashcards %}
+                  {% include 'flashcards/_preview.html' with flashcard=flashcard %}
+              {% empty %}
+                  <p class="text-muted">No flashcards available.</p>
+              {% endfor %}
           </div>
 
           <!-- Logout Button -->

@@ -1,0 +1,25 @@
+{% comment %}
+This partial is used to render a preview of a flashcard in the sidebar
+{% endcomment %}
+
+<div class="card mb-2 flashcard-preview" data-flashcard-id="{{ flashcard.id }}">
+  <div class="card-body p-2">
+    <div class="flashcard-content">
+      <div class="flashcard-front mb-1">
+        <small class="text-muted">Front:</small>
+        <div>{{ flashcard.front }}</div>
+      </div>
+      <div class="flashcard-back">
+        <small class="text-muted">Back:</small>
+        <div>{{ flashcard.back }}</div>
+      </div>
+    </div>
+    {% if flashcard.tags %}
+    <div class="flashcard-tags mt-2">
+      {% for tag in flashcard.tags %}
+        <span class="badge bg-secondary me-1">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>

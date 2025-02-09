@@ -12,7 +12,7 @@ export default class extends Controller {
   registeredTools = []
 
   registerTool(tool) {
-    this.registeredTools.push(tool)
+    this.registeredTools.push(tool.detail)
     if (this.isConnected && this.dc) {
       this.updateTools()
     }
@@ -60,6 +60,8 @@ export default class extends Controller {
   }
 
   connect() {
+    // Listen for tool registrations using data-action in the HTML
+
     if (this.autoConnectValue) {
       this.initializeConnection();
     }
