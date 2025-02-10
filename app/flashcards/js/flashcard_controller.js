@@ -206,6 +206,18 @@ export default class extends Controller {
       'hard': 'hard'
     }
     const backendStatus = statusMap[status] || status
+
+    // Play appropriate sound based on status
+    const soundMap = {
+      'correct': new Audio('/static/sounds/correct.mp3'),  // nice ting
+      'incorrect': new Audio('/static/sounds/incorrect.mp3'),  // bingbong
+      'hard': new Audio('/static/sounds/hard.mp3')  // boop
+    }
+    
+    const sound = soundMap[status]
+    if (sound) {
+      sound.play().catch(error => console.error('Error playing sound:', error))
+    }
     
     await this.postJudgement(card, backendStatus)
   }
