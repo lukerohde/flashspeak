@@ -2,8 +2,9 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.template.loader import render_to_string
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils import timezone
+from django.db import models
 from random import choice
 from .models import FlashCard, ReviewStatus
 from .serializers import FlashCardSerializer
@@ -13,8 +14,12 @@ class FlashCardViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Only return flashcards belonging to the current user
-        return FlashCard.objects.filter(user=self.request.user)
+        # Only return flashcards belonging to the current user, sorted by most recent review
+        return FlashCard.objects.filter(user=self.request.user).order_by(
+            models.F('front_last_review').desc(nulls_last=True),
+            models.F('back_last_review').desc(nulls_last=True),
+            '-created_at'
+        )
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -116,6 +121,14 @@ class FlashCardViewSet(viewsets.ModelViewSet):
         # Update the review status
         card.update_review(ReviewStatus(status), side)
 
+        # Get the updated preview of the judged card
+        updated_preview = render_to_string('flashcards/_preview.html', {'flashcard': card})
+
         # Get the next card
         show_both = request.query_params.get('show_both') == 'true'
-        return self.next_review(request)
+        
+        # Combine the responses
+        return Response({
+            'updated_preview': updated_preview,  # The updated preview of the judged card
+            'updated_card_id': str(card.id)  # The ID of the updated card
+        })

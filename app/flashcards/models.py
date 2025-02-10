@@ -38,15 +38,18 @@ class FlashCard(models.Model):
     def __str__(self):
         return f"FlashCard {self.id}: {self.front[:30]}..."
 
-    def is_due_for_review(self, side='front'):
-        """Check if the card is due for review on the given side"""
-        last_review = getattr(self, f'{side}_last_review')
-        interval = getattr(self, f'{side}_interval')
-
-        if not last_review:
-            return True
-
-        return last_review + timezone.timedelta(minutes=interval) <= timezone.now()
+    def is_due_for_review(self, side=None):
+        """Check if the card is due for review. If side is specified, checks only that side.
+        Otherwise checks both sides and returns True if either side is due."""
+        if side:
+            last_review = getattr(self, f'{side}_last_review')
+            interval = getattr(self, f'{side}_interval')
+            if not last_review:
+                return True
+            return last_review + timezone.timedelta(minutes=interval) <= timezone.now()
+        else:
+            # Check both sides
+            return self.is_due_for_review('front') or self.is_due_for_review('back')
 
     def update_review(self, status: ReviewStatus, side='front'):
         """Update review status and schedule next review using SM-2 algorithm"""

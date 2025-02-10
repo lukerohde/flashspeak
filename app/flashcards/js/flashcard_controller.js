@@ -147,6 +147,7 @@ export default class extends Controller {
     // Get current card data from the review container
     const card = this.reviewContainerTarget.querySelector('.flashcard')
     if (!card) {
+      alert('No card to review')
       return
     }
     
@@ -161,13 +162,13 @@ export default class extends Controller {
     The complete card content is:
     Front: "${front}"
     Back: "${back}"
-    Please read the ${side} to the user in either english or japanese as shown. After they respond, assess their answer using your of the hidden side of the card and use the judge_card tool to grade it as:
+    Please just read the ${side} to the user in either english or japanese as shown, nothing more or less. After they respond, assess their answer against the of the hidden side of the card, then use judge_card to formalise feedback.:
     - 'correct': if they demonstrate clear understanding
     - 'incorrect': if they show significant misunderstanding
     - 'hard': if they got it mostly right but struggled or took time
     Do not reveal the correct answer unless they ask for it. Provide hints and corrections as needed.
     
-    Here's an example of how the assistant helps the user with flashcard study
+    Here's an example dialog demonstrating your helpful behaviour:
     
     Assistant: パスポートを見せてください
     User: Please show me your passport
@@ -225,18 +226,6 @@ export default class extends Controller {
       'hard': 'hard'
     }
     const backendStatus = statusMap[status] || status
-
-    // Play appropriate sound based on status
-    const soundMap = {
-      'correct': new Audio('/static/sounds/correct.mp3'),  // nice ting
-      'incorrect': new Audio('/static/sounds/incorrect.mp3'),  // bingbong
-      'hard': new Audio('/static/sounds/hard.mp3')  // boop
-    }
-    
-    const sound = soundMap[status]
-    if (sound) {
-      sound.play().catch(error => console.error('Error playing sound:', error))
-    }
     
     await this.postJudgement(card, backendStatus)
   }
@@ -245,6 +234,18 @@ export default class extends Controller {
   async postJudgement(card, status) {
     console.log('Posting judgment:', { status, cardData: card?.dataset })
     
+    // Play appropriate sound based on status
+    const soundMap = {
+      'easy': new Audio('/static/sounds/correct.mp3'),  // nice ting
+      'forgot': new Audio('/static/sounds/incorrect.mp3'),  // bingbong
+      'hard': new Audio('/static/sounds/hard.mp3')  // boop
+    }
+    
+    const sound = soundMap[status]
+    if (sound) {
+      sound.play().catch(error => console.error('Error playing sound:', error))
+    }
+
     try {
       const response = await this.postWithToken(
         `/api/flashcards/${card.dataset.flashcardId}/review/`,
@@ -256,7 +257,29 @@ export default class extends Controller {
       
       if (!response.ok) throw new Error('Failed to update review')
       
-      // Fetch the next card (which will trigger reviewCard if one exists)
+      const data = await response.json()
+
+      // Update the preview of the judged card and move it to the top
+      if (this.hasPreviewContainerTarget && data.updated_preview) {
+        const existingCard = this.previewContainerTarget.querySelector(
+          `.flashcard-preview[data-flashcard-id="${data.updated_card_id}"]`
+        )
+        if (existingCard) {
+          // Create a temporary container to hold the new HTML
+          const temp = document.createElement('div')
+          temp.innerHTML = data.updated_preview
+          const updatedCard = temp.firstElementChild
+
+          // Replace the existing card with the updated one and move it to the top
+          this.previewContainerTarget.insertBefore(
+            updatedCard,
+            this.previewContainerTarget.firstChild
+          )
+          existingCard.remove()
+        }
+      }
+
+      // Fetch the next card for review
       await this.fetchNextCard()
     } catch (error) {
       console.error('Error updating review:', error)
