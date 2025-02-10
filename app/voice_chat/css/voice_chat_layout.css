@@ -6,6 +6,12 @@
     height: 100%;
     overflow-y: auto;
     max-height: calc(100vh - 6rem);
+    transition: max-height 0.3s ease;
+}
+
+/* Adjust transcript height when review area is visible */
+.review-area:not(.d-none) ~ .transcript-container {
+    max-height: calc(100vh - 18rem); /* Adjust this value based on review area height */
 }
 
 /* Desktop Sidebar */

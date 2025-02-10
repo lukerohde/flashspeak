@@ -2,7 +2,10 @@
 This partial is used to render a preview of a flashcard in the sidebar
 {% endcomment %}
 
-<div class="card mb-2 flashcard-preview" data-flashcard-id="{{ flashcard.id }}">
+<div class="card mb-2 flashcard-preview flashcard" 
+     data-flashcard-id="{{ flashcard.id }}"
+     data-flashcard-front-value="{{ flashcard.front }}"
+     data-flashcard-back-value="{{ flashcard.back }}">
   <div class="card-body p-2">
     <div class="flashcard-content">
       <div class="flashcard-front mb-1">
@@ -13,6 +16,12 @@ This partial is used to render a preview of a flashcard in the sidebar
         <small class="text-muted">Back:</small>
         <div>{{ flashcard.back }}</div>
       </div>
+    </div>
+    <div class="text-center mt-2">
+      <button class="btn btn-sm btn-primary" 
+              data-action="flashcard#playFullCard">
+        <i class="bi bi-play-fill"></i> Play
+      </button>
     </div>
     {% if flashcard.tags %}
     <div class="flashcard-tags mt-2">

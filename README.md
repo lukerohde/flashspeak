@@ -6,6 +6,16 @@ A Django-based language learning application that combines the power of spaced r
 
 We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app in /Users/lrohde/voice-anki/app.
 
+### Technical Architecture
+- Server-side rendering with Django templates
+- StimulusJS for interactive components
+  - Flash Card Controller
+  - Voice Chat Controller
+  - Transcription Controller
+- Asset bundling with NPM and Parcel
+- Bootstrap 5 for responsive layout
+- Uses OpenAI RealTime API for voice communication
+
 ### Voice Chat with AI Tutor
 - As a language learner, I want to practice speaking Japanese with an AI tutor
   - DONE Bootstrap-based responsive layout with main content and sidebar
@@ -30,27 +40,34 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
 
 ### Flashcard Creation
 - As a learner, I want to create flashcards directly from our conversation
+  - DONE Ask AI to make flashcard (tool use)
   - Text selection handling in transcript
-  - Server-side flashcard creation endpoint
-  - Real-time sidebar update with new card
+  - DONE Server-side flashcard creation endpoint
+  - DONE Real-time sidebar update with new card
 
 - As a learner, I want to create flashcards by selecting text from the transcript
   - Text selection event handling
   - Popup form for card creation
   - Card preview before saving
 
+- As a learner, I want to review and edit flashcards
+  - DONE-ish List flashcards
+  - Search flashcards
+  - Inline editing interface
+  - Card update endpoint
+  - Optimistic UI updates
+
 - As a learner, I want to categorize my flashcards (multiple categories per card)
   - Category management in sidebar
   - Multi-select category interface
   - Category CRUD endpoints
 
-- As a learner, I want to review and edit flashcards
-  - Inline editing interface
-  - Card update endpoint
-  - Optimistic UI updates
-
 ### Flashcard Review
 - As a learner, I want to review flashcards using spaced repetition (SM-2)
+  - Fetch next card
+  - AI reads card front and back
+  - Score card (Easy, Hard, Forgot)
+  - AI rates card (Easy, Hard, Forgot)
   - SM-2 algorithm implementation
   - Review scheduling system
   - Review state persistence

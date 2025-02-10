@@ -616,11 +616,34 @@ export default class extends Controller {
     this.sendEvent(commit);
   }
 
-  createResponse() {
+  addContext(event) {
+    console.log('Voice chat received context:', event.detail)
+    const context = event.detail
+    if (!context) return
+
+    const contextEvent = {
+      type: "conversation.item.create",
+      item: {
+        type: "message",
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: context
+          }
+        ]
+      }
+    }
+
+    this.sendEvent(contextEvent)
+  }
+
+  pleaseRespond() {
+    console.log('Voice chat received please-respond')
     const response = {
       type: "response.create"
-    };
-    this.sendEvent(response);
+    }
+    this.sendEvent(response)
   }
 
   clearAudioBuffer() {
@@ -647,7 +670,7 @@ export default class extends Controller {
     
     // Commit the audio buffer and create response
     this.commitAudioBuffer();
-    this.createResponse();
+    this.pleaseRespond();
     
     // If we're unmuted, re-enable VAD and keep the UI in unmuted state
     if (!this.isMuted) {
