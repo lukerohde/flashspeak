@@ -29,6 +29,7 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - DONE Independent scrolling for transcript 
   - DONE Auto-scroll for new transcript entries
   - DONE Server-rendered transcript updates
+  - The transcript knows if I'm speaking Japanese or English
 
 - As a user, I want flexible microphone controls:
   - DONE WebRTC audio streaming setup
@@ -44,6 +45,11 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - Text selection handling in transcript
   - DONE Server-side flashcard creation endpoint
   - DONE Real-time sidebar update with new card
+  - File upload
+  - Make sure english is on the front
+  - The AI can make multiple cards at a time
+  - There is positive feedback when cards are made
+  - Newly made cards go straight in for review
 
 - As a learner, I want to create flashcards by selecting text from the transcript
   - Text selection event handling
@@ -51,7 +57,8 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
   - Card preview before saving
 
 - As a learner, I want to review and edit flashcards
-  - DONE-ish List flashcards
+  - DONE List flashcards
+  - DONE Delete flashcards
   - Search flashcards
   - Inline editing interface
   - Card update endpoint
@@ -64,25 +71,36 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
 
 ### Flashcard Review
 - As a learner, I want to review flashcards using spaced repetition (SM-2)
-  - Fetch next card
-  - AI reads card front and back
-  - Score card (Easy, Hard, Forgot)
-  - AI rates card (Easy, Hard, Forgot)
-  - SM-2 algorithm implementation
-  - Review scheduling system
-  - Review state persistence
+  - DONE Fetch next card
+  - DONE AI reads card front and back
+  - DONE Score card (Easy, Hard, Forgot)
+  - DONE AI rates card (Easy, Hard, Forgot)
+  - The user can override an AI judgement
+  - The user can set the next review interval
+  - The AI explains the users error succinctly, instead of just moving straight to the next card
+  - DONE SM-2 algorithm implementation
+  - DONE Review scheduling system
+  - DONE Review state persistence
+
+- As a learner, I want the app to work nicely on mobile
+  - DONE Responsive layout with sidebar and main content
+  - DONE Auto-scroll for new transcript entries
+  - DONE Sidebar collapses
+  - Mute/Unmute button at easy reach
+  - Self assessment buttons at easy reach - perhaps swipe
 
 - As a learner, I want to practice pronunciation and discuss cards during reviews
-  - Integration with voice chat system
-  - Card-specific conversation context
+  - DONE Integration with voice chat system
+  - DONE Card-specific conversation context
   - Progress tracking during review
+  - The AI is careful about pronounciation
 
 - As a learner, I want to filter reviews by category
   - Category filter interface in sidebar
-  - Dynamic review queue updates
+  - DONE Dynamic review queue updates
   - Review statistics by category
 
-- As a learner, I want to track my review pro gress
+- As a learner, I want to track my review progress
   - Review history tracking
   - Progress visualization
   - Statistics calculation endpoints
@@ -95,26 +113,6 @@ We are migrating from our POC in /Users/lrohde/voice-anki to a proper django app
 - As a language learner, I want to reset tutor prompts to default settings
 - As a language learner, I want to customize the tutor's teaching style and focus areas
 
-## Implementation Approach
-
-### Story 1: Japanese Voice Chat Implementation
-
-1. Layout Setup
-   - Bootstrap-based responsive layout
-   - Main content area with transcript
-   - Sliding sidebar (full-screen on mobile, fixed on desktop)
-     - Deck/category selection
-     - Flashcard list
-   - Footer area for active flashcard review
-   - Independent scrolling for transcript and sidebar
-   - Auto-scroll for new transcript entries
-
-### Technical Architecture
-- Server-side rendering with Django templates
-- StimulusJS for interactive components
-- Partial updates via JSON payloads
-- Asset bundling with NPM and Parcel
-- Bootstrap 5 for responsive layout
 
 ## Setup
 

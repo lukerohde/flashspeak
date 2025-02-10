@@ -32,7 +32,7 @@ export default class extends Controller {
             description: 'Optional tags to categorize the flashcard'
           }
         },
-        required: ['front', 'back']
+        required: ['front', 'back', 'tags']
       }
     }
 
