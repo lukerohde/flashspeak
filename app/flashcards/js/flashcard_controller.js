@@ -49,9 +49,28 @@ export default class extends Controller {
       }
     }
 
-    console.log('Dispatching tool registration:', { flashcardTool, startReviewTool })
+    // AI judgment tool
+    const judgeCardTool = {
+      type: 'function',
+      name: 'judge_card',
+      description: 'Judge the current flashcard based on correctness',
+      parameters: {
+        type: 'object',
+        properties: {
+          status: {
+            type: 'string',
+            description: 'The judgment status: correct, incorrect, or hard',
+            enum: ['correct', 'incorrect', 'hard']
+          }
+        },
+        required: ['status']
+      }
+    }
+
+    console.log('Dispatching tool registration:', { flashcardTool, startReviewTool, judgeCardTool })
     this.dispatch('register-tool', { detail: flashcardTool })
     this.dispatch('register-tool', { detail: startReviewTool })
+    this.dispatch('register-tool', { detail: judgeCardTool })
   }
 
   async handleFunctionCall(event) {
@@ -73,6 +92,13 @@ export default class extends Controller {
       }
     } else if (name === 'start_review') {
       this.fetchNextCard()
+    } else if (name === 'judge_card') {
+      const card = this.reviewContainerTarget.querySelector('.flashcard')
+      if (card) {
+        await this.handleAIJudgement(args.status, card)
+      } else {
+        console.error('No card found to judge')
+      }
     }
   }
 
@@ -139,24 +165,54 @@ export default class extends Controller {
     console.log('Found card:', card.dataset)
     
     const side = card.dataset.flashcardSide
-    const content = side === 'front' 
-      ? card.dataset.flashcardFrontValue 
-      : card.dataset.flashcardBackValue
+    const front = card.dataset.flashcardFrontValue
+    const back = card.dataset.flashcardBackValue
+    const shownContent = side === 'front' ? front : back
     
-    // Instruction to read one side and assess response
-    const instruction = `We are reviewing flashcards. Please read the ${side} of the card: "${content}". After the user responds, assess their answer but do not reveal the correct answer unless they ask for it. Provide hints and corrections as needed.`
+    // Instruction to read the card and assess response
+    const instruction = `We are reviewing flashcards.
+    Currently showing the ${side}: "${shownContent}"
+    The complete card content is:
+    Front: "${front}"
+    Back: "${back}"
+    Please read the ${side} to the user in either english or japanese as shown. After they respond, assess their answer using your of the hidden side of the card and use the judge_card tool to grade it as:
+    - 'correct': if they demonstrate clear understanding
+    - 'incorrect': if they show significant misunderstanding
+    - 'hard': if they got it mostly right but struggled or took time
+    Do not reveal the correct answer unless they ask for it. Provide hints and corrections as needed.`
     
     console.log('Dispatching review events with instruction:', instruction)
     this.dispatch('add-context', { detail: instruction })
     this.dispatch('please-respond')
   }
 
-  async judgeCard(event) {
-    console.log('Judging card')
+  // Handle self-assessment from user clicking buttons
+  async handleSelfAssessment(event) {
     const status = event.target.dataset.status
     const card = event.target.closest('.flashcard')
-    console.log('Judge data:', { status, cardData: card?.dataset })
     if (!card || !status) return
+    
+    await this.postJudgement(card, status)
+  }
+
+  // Handle AI judgment of user's response
+  async handleAIJudgement(status, card) {
+    if (!card || !status) return
+
+    // Convert AI judgment to backend status values
+    const statusMap = {
+      'correct': 'easy',
+      'incorrect': 'forgot',
+      'hard': 'hard'
+    }
+    const backendStatus = statusMap[status] || status
+    
+    await this.postJudgement(card, backendStatus)
+  }
+
+  // Common method to post judgment to backend
+  async postJudgement(card, status) {
+    console.log('Posting judgment:', { status, cardData: card?.dataset })
     
     try {
       const response = await this.postWithToken(
