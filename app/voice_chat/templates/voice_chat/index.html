@@ -13,16 +13,16 @@
   <div class="row h-100 g-0 px-3 pt-3">
     <!-- Main Content Area -->
     <div class="col-md-9 d-flex flex-column">
+      <!-- Review Area -->
+      <div data-flashcard-target="reviewContainer" class="review-area d-none bg-white rounded border p-3">
+        <!-- Active flashcard for review will be shown here -->
+      </div>
+
       <!-- Transcript Area -->
       <div id="transcript-container" data-controller="transcript" class="transcript-container bg-white rounded border flex-grow-1 mb-3" data-transcript-target="container">
         <!-- Transcript content will appear here -->
       </div>
       {% include 'voice_chat/_message.html' %}
-
-      <!-- Review Area -->
-      <div data-flashcard-target="reviewContainer" class="review-area d-none position-fixed bottom-0 start-0 w-75 p-3 bg-light border-top">
-        <!-- Active flashcard for review will be shown here -->
-      </div>
     </div>
 
     <!-- Sidebar -->
@@ -68,9 +68,9 @@
           
           <div class="d-flex justify-content-between align-items-center p-3">
             <h5 class="mb-0">Flashcards</h5>
-            <button class="btn btn-primary btn-sm" 
+            <button class="btn btn-sm btn-outline-primary" 
                     data-action="flashcard#fetchNextCard">
-              <i class="bi bi-play-fill"></i> Start Review
+              <i class="bi bi-play-fill"></i> Review
             </button>
           </div>
           <div class="flashcard-previews p-3 flex-grow-1 overflow-auto" data-flashcard-target="previewContainer">
