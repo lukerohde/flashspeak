@@ -286,7 +286,40 @@ export default class extends Controller {
     }
   }
 
-  async postWithToken(url, data) {
+  async deleteCard(event) {
+    const card = event.currentTarget.closest('.flashcard-preview')
+    const cardId = card.dataset.flashcardId
+
+    try {
+      const response = await this.postWithToken(
+        `/api/flashcards/${cardId}/`,
+        {},
+        'DELETE'
+      )
+
+      if (!response.ok) throw new Error('Failed to delete flashcard')
+
+      // Animate the card sliding up and then remove it
+      card.style.transition = 'all 0.3s ease-out'
+      card.style.maxHeight = card.offsetHeight + 'px'
+      
+      // Start animation in the next frame
+      requestAnimationFrame(() => {
+        card.style.maxHeight = '0'
+        card.style.opacity = '0'
+        card.style.marginBottom = '0'
+
+        // Remove the element after animation completes
+        setTimeout(() => {
+          card.remove()
+        }, 300)
+      })
+    } catch (error) {
+      console.error('Error deleting flashcard:', error)
+    }
+  }
+
+  async postWithToken(url, data, method = 'POST') {
     const csrfToken = document.cookie.split('; ')
       .find(row => row.startsWith('csrftoken='))
       ?.split('=')[1];
@@ -296,7 +329,7 @@ export default class extends Controller {
     }
 
     return fetch(url, {
-      method: 'POST',
+      method: method,
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',

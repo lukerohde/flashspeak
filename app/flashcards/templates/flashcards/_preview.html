@@ -21,14 +21,19 @@ This partial is used to render a preview of a flashcard in the sidebar
         <div>{{ flashcard.back }}</div>
       </div>
     </div>
-    <div class="d-flex justify-content-between align-items-end mt-2">
-      <div class="flashcard-tags">
-        {% if flashcard.tags %}
-          {% for tag in flashcard.tags %}
-            <span class="badge bg-secondary me-1">{{ tag }}</span>
-          {% endfor %}
-        {% endif %}
+    {% if flashcard.tags %}
+      <div class="flashcard-tags mb-2">
+        {% for tag in flashcard.tags %}
+          <span class="badge bg-secondary me-1">{{ tag }}</span>
+        {% endfor %}
       </div>
+    {% endif %}
+    <div class="d-flex justify-content-between align-items-center">
+      <button class="btn btn-sm btn-link text-danger p-0" 
+              data-action="flashcard#deleteCard"
+              title="Delete flashcard">
+        <i class="bi bi-trash"></i>
+      </button>
       <div class="flashcard-stats">
         {% with total_reviews=flashcard.front_review_count|add:flashcard.back_review_count %}
           <span class="badge bg-info me-1" title="Total Reviews">
