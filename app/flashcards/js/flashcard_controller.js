@@ -4,12 +4,10 @@ export default class extends Controller {
   static targets = ["previewContainer", "reviewContainer"]
 
   connect() {
-    console.log('Flashcard controller connected')
     this.registerTools()
   }
 
   registerTools() {
-    console.log('Registering flashcard tools')
     // Flashcard creation tool
     const flashcardTool = {
       type: 'function',
@@ -42,7 +40,7 @@ export default class extends Controller {
     const startReviewTool = {
       type: 'function',
       name: 'start_review',
-      description: 'Start reviewing flashcards',
+      description: 'When the user asks you to start, run this tool.',
       parameters: {
         type: 'object',
         properties: {}
@@ -53,7 +51,7 @@ export default class extends Controller {
     const judgeCardTool = {
       type: 'function',
       name: 'judge_card',
-      description: 'Judge the current flashcard based on correctness',
+      description: 'Judge the current flashcard based on correctness.  If the user says next card please, that is an invitation to judge their understanding and move on.',
       parameters: {
         type: 'object',
         properties: {
@@ -67,14 +65,12 @@ export default class extends Controller {
       }
     }
 
-    console.log('Dispatching tool registration:', { flashcardTool, startReviewTool, judgeCardTool })
     this.dispatch('register-tool', { detail: flashcardTool })
     this.dispatch('register-tool', { detail: startReviewTool })
     this.dispatch('register-tool', { detail: judgeCardTool })
   }
 
   async handleFunctionCall(event) {
-    console.log('Handling function call:', event.detail)
     const { name, arguments: args } = event.detail
 
     if (name === 'create_flashcard') {
@@ -110,7 +106,6 @@ export default class extends Controller {
   }
 
   async playFullCard(event) {
-    console.log('Playing full card')
     const card = event.target.closest('.flashcard')
     if (!card) return
 
@@ -119,15 +114,12 @@ export default class extends Controller {
     
     // Instruction to read both sides
     const instruction = `Please read both sides of this flashcard. Front: "${front}". Back: "${back}".`
-    console.log('Dispatching play events with instruction:', instruction)
     this.dispatch('add-context', { detail: instruction })
     this.dispatch('please-respond')
   }
 
   async fetchNextCard() {
-    console.log('Fetching next card')
     if (!this.hasReviewContainerTarget) {
-      console.log('No review container target found')
       return
     }
 
@@ -141,13 +133,10 @@ export default class extends Controller {
       const data = await response.json()
       this.reviewContainerTarget.innerHTML = data.html
       
-      console.log('Received next card data:', data)
       // If we got a card, automatically start the review
       if (data.html.includes('flashcard')) {
-        console.log('Card found, starting review')
         this.reviewCard()
       } else {
-        console.log('No card found in response')
       }
     } catch (error) {
       console.error('Error loading next review:', error)
@@ -155,14 +144,11 @@ export default class extends Controller {
   }
 
   async reviewCard() {
-    console.log('Starting card review')
     // Get current card data from the review container
     const card = this.reviewContainerTarget.querySelector('.flashcard')
     if (!card) {
-      console.log('No card found in review container')
       return
     }
-    console.log('Found card:', card.dataset)
     
     const side = card.dataset.flashcardSide
     const front = card.dataset.flashcardFrontValue
@@ -179,9 +165,42 @@ export default class extends Controller {
     - 'correct': if they demonstrate clear understanding
     - 'incorrect': if they show significant misunderstanding
     - 'hard': if they got it mostly right but struggled or took time
-    Do not reveal the correct answer unless they ask for it. Provide hints and corrections as needed.`
+    Do not reveal the correct answer unless they ask for it. Provide hints and corrections as needed.
     
-    console.log('Dispatching review events with instruction:', instruction)
+    Here's an example of how the assistant helps the user with flashcard study
+    
+    Assistant: パスポートを見せてください
+    User: Please show me your passport
+    <assistant uses judge_card(correct)>
+    
+    Assistant: I have a reservation
+    User: よよくがあります
+    Assistant: Not quiet, reservation is よやく
+    User: よやくがあります
+    <assistant uses judge_card(hard)>
+
+    Assistant: Room
+    User: I forgot
+    Assistant: The word for room is へや
+    <assistant uses judge_card(forgot)>
+
+    Assistant: 足
+    User: Blue
+    Assistant: あし means foot or leg depending on context
+    User:  Okay あし means foot of leg
+    <assistant uses judge_card(incorrect)>
+
+    Assistant: 新しい
+    User: Sorry I didn't catch that
+    Assistant: 新しい
+    User:  New
+    <assistant uses judge_card(correct)>
+    
+    Assistant: Elbow
+    User: モンキー
+    <assistant uses judge_card(correct)>
+    `
+    
     this.dispatch('add-context', { detail: instruction })
     this.dispatch('please-respond')
   }

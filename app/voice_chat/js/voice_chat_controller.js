@@ -30,7 +30,6 @@ export default class extends Controller {
   }
 
   sendEvent(event) {
-    console.log('Sending event:', event);
     if (this.dc) {
       this.dc.send(JSON.stringify(event));
     } else {
@@ -145,7 +144,6 @@ export default class extends Controller {
   }
 
   handleTrackEnded() {
-    console.log('MediaStreamTrack ended');
     this.handleMicrophoneFailure('Microphone disconnected');
   }
 
@@ -160,8 +158,6 @@ export default class extends Controller {
     // 2. The track exists but its readyState is 'ended'
     const track = this.microphoneStream?.getAudioTracks()[0];
     if (!track || track.readyState === 'ended') {
-      console.log('MediaStreamTrack ended or not available:', 
-        track ? `readyState: ${track.readyState}` : 'no track');
       this.handleMicrophoneFailure('Microphone disconnected');
     }
   }
@@ -453,7 +449,6 @@ export default class extends Controller {
         break;
 
       default:
-        console.log('Unhandled message type:', message.type);
   }
 
 
