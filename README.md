@@ -1,4 +1,4 @@
-# Voice Anki
+# FlashSpeak
 
 A Django-based language learning application that combines the power of spaced repetition with AI-powered voice interaction. Initially focused on Japanese language learning, with a vision to support multiple languages in the future.
 
