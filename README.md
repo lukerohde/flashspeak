@@ -151,6 +151,16 @@ Once in the app container you can run the django commands
 python manage.py runserver 0.0.0.0:3000
 ``` 
 
+To rebuild your javascript
+```
+npm run build
+```
+
+To have up to date not reloading CSS and JS during development
+```
+npm run dev
+``` 
+
 To run with a production gunicorn server
 ```
 ./start
@@ -173,10 +183,19 @@ To debug your playwright tests
 PWDEBUG=1 pytest --headed
 ```
 
+To view and debug your app on mobile (mobile webrtc needs https) or share a dev preview external 
+
+```brew install ngrok```
+
+Sign up and setup your token [here](https://dashboard.ngrok.com/get-started/your-authtoken)
+```
+ngrok http 3000
+```
+
 # Deployment Instructions
 
 For more detailed instructions, please refer to the following README files:
 
-- [Deploy to AWS](deploy-aws-infra/pulumi/README.md)
+- [Deploy to AWS](deploy-aws-infra/pulumi/README.md) - just the asset bucket
 - [Deploy to Render](deploy-render/README.md)
 - [Deploy to Digital Ocean](deploy-do/README.md)
