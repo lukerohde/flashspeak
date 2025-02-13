@@ -192,6 +192,9 @@ Sign up and setup your token [here](https://dashboard.ngrok.com/get-started/your
 ngrok http 3000
 ```
 
+Responsive design mode for 
+- ios mini 13: 375 x 812
+
 # Deployment Instructions
 
 For more detailed instructions, please refer to the following README files:

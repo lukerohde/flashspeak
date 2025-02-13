@@ -11,6 +11,18 @@ export default class extends Controller {
 
   registeredTools = []
 
+  connect() {
+    // Listen for tool registrations using data-action in the HTML
+
+    if (this.autoConnectValue) {
+      this.initializeConnection();
+    }
+  }
+
+  disconnect() {
+    this.closeConnection();
+  }
+
   registerTool(tool) {
     this.registeredTools.push(tool.detail)
     if (this.isConnected && this.dc) {
@@ -58,17 +70,6 @@ export default class extends Controller {
     }
   }
 
-  connect() {
-    // Listen for tool registrations using data-action in the HTML
-
-    if (this.autoConnectValue) {
-      this.initializeConnection();
-    }
-  }
-
-  disconnect() {
-    this.closeConnection();
-  }
 
   async initializeConnection() {
     try {

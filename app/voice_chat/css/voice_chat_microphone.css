@@ -1,3 +1,10 @@
+@media (max-width: 767.98px) {
+  .position-absolute {
+    top: 50% !important;
+    transform: translateY(-50%);
+  }
+}
+
 .voice-button {
   width: 64px;
   height: 64px;
@@ -11,6 +18,11 @@
   border: 2px solid;
   background: white;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .voice-button i {
@@ -86,8 +98,13 @@
 .voice-status {
   font-size: 0.875rem;
   color: var(--bs-gray-600);
-  margin-top: 0.5rem;
-  text-align: center;
+  margin-bottom: 0.5rem;
+  text-align: right;
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
 }
 
 /* Mic select styling */

@@ -19,7 +19,24 @@
       </div>
 
       <!-- Transcript Area -->
-      <div id="transcript-container" data-controller="transcript" class="transcript-container bg-white rounded border flex-grow-1 mb-3" data-transcript-target="container">
+      <div id="transcript-container" data-controller="transcript" class="transcript-container bg-white rounded border flex-grow-1 mb-3 position-relative" data-transcript-target="container">
+        <!-- Voice Button -->
+        <div class="sticky-top d-flex justify-content-end p-3">
+          <button
+            class="voice-button"
+            data-voice-chat-target="walkieButton"
+            data-action="
+              pointerdown->voice-chat#pressStart
+              pointerup->voice-chat#pressEnd
+              keydown@window->voice-chat#spaceDown
+              keyup@window->voice-chat#spaceUp
+            "
+            data-state="disconnected"
+            data-muted="true"
+            title="Hold to talk or tap to toggle mute">
+            <i class="bi bi-telephone-x"></i>
+          </button>
+        </div>
         <!-- Transcript content will appear here -->
       </div>
       {% include 'voice_chat/_message.html' %}
@@ -33,31 +50,14 @@
       </div>
       <div class="offcanvas-body p-md-3 pt-md-0 d-flex flex-column">
         <div class="bg-white flex-grow-1 d-flex flex-column {% if request.user_agent.is_mobile %}{% else %}rounded border{% endif %}">
-          <!-- Microphone Controls -->
-          <div id="microphone-controls" class="p-3 pb-0 d-flex flex-column align-items-center">
-            <!-- Voice Button -->
-            <button
-              class="voice-button"
-              data-voice-chat-target="walkieButton"
-              data-action="
-                pointerdown->voice-chat#pressStart
-                pointerup->voice-chat#pressEnd
-                keydown@window->voice-chat#spaceDown
-                keyup@window->voice-chat#spaceUp
-              "
-              data-state="disconnected"
-              data-muted="true"
-              title="Hold to talk or tap to toggle mute">
-              <i class="bi bi-telephone-x"></i>
-            </button>
-
+          <!-- Voice Status and Mic Selection -->
+          <div class="p-3">
             <!-- Status Text -->
-            <div class="voice-status" data-voice-chat-target="status">
+            <div class="voice-status d-none d-md-block mb-3 text-center" data-voice-chat-target="status">
               Hold to talk or tap to toggle
             </div>
-
-            <!-- Mic Selection (Collapsed by default on mobile) -->
-            <div class="mic-select-container w-100 mt-3 d-none d-md-block">
+            <!-- Mic Selection -->
+            <div class="mic-select-container w-100">
               <select class="form-select form-select-sm" data-voice-chat-target="micSelect" data-action="change->voice-chat#switchMicrophone">
                 <option value="">Loading microphones...</option>
               </select>
