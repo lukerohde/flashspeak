@@ -137,7 +137,6 @@ export default class extends Controller {
       this.updateStatus(`Using microphone: ${this.audioTrack.label}`, 'success');
       
       // Set up space bar controls for push-to-talk
-      this.setupPushToTalk();
     } catch (error) {
       throw new Error('Failed to access microphone: ' + error.message);
     }
@@ -187,57 +186,94 @@ export default class extends Controller {
     this.updateStatus(`${reason}. Click to reconnect.`, 'error');
   }
 
-  setupPushToTalk() {
-    // Space bar handlers
-    const keydownHandler = (e) => {
-      if (e.code === 'Space' && !e.repeat && this.audioTrack) {
-        e.preventDefault();
-        this.pressStartTime = Date.now();
-        
-        // Clear any existing timer
-        if (this.holdTimer) {
-          clearTimeout(this.holdTimer);
-        }
-        
-        // Set timer for push-to-talk
-        this.holdTimer = setTimeout(() => {
-          if (this.audioTrack) {
-            this.pushTalkActive = true;
-            this.startTalking();
-          }
-        }, this.holdThreshold);
-      }
-    };
 
-    const keyupHandler = (e) => {
-      if (e.code === 'Space' && this.audioTrack) {
-        e.preventDefault();
-        
-        // Clear the hold timer
-        if (this.holdTimer) {
-          clearTimeout(this.holdTimer);
-          this.holdTimer = null;
-        }
-        
-        const pressDuration = Date.now() - this.pressStartTime;
-        
-        if (this.pushTalkActive) {
-          // Was in push-to-talk mode
-          this.stopTalking();
-          this.pushTalkActive = false;
-        } else if (pressDuration < this.holdThreshold) {
-          // Short press - toggle mute
-          this.toggleMute();
-        }
-      }
-    };
+  pressStartCommon() {
+    // If not connected, initialize the connection now
+    if (!this.isConnected) {
+      this.initializeConnection();
+    }
 
-    document.addEventListener('keydown', keydownHandler);
-    document.addEventListener('keyup', keyupHandler);
+    // If still no audio track after we try to connect, bail out
+    if (!this.audioTrack) return;
 
-    // Store handlers for cleanup
-    this.pushToTalkHandlers = { keydown: keydownHandler, keyup: keyupHandler };
+    this.pressStartTime = Date.now();
+
+    // Clear any existing hold timer
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+
+    // Schedule a timer for push-to-talk if user holds longer than threshold
+    this.holdTimer = setTimeout(() => {
+      this.pushTalkActive = true;
+      this.startTalking();
+    }, this.holdThreshold);
   }
+
+  pressEndCommon() {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+
+    const pressDuration = Date.now() - this.pressStartTime;
+
+    if (this.pushTalkActive) {
+      // Was in push-to-talk mode
+      this.stopTalking();
+      this.pushTalkActive = false;
+    } else if (pressDuration < this.holdThreshold) {
+      // Short press => toggle mute
+      this.toggleMute();
+    }
+  }
+
+  /* =====================
+   *  POINTER EVENTS
+   * ===================== */
+
+  pressStart(event) {
+    // Usually no need for preventDefault if it's a button element
+    this.pressStartCommon();
+  }
+
+  pressEnd(event) {
+    this.pressEndCommon();
+  }
+
+  /* =====================
+   *  SPACEBAR EVENTS
+   * ===================== */
+
+  spaceDown(event) {
+    // Only handle space, skip repeats
+    if (event.code !== "Space" || event.repeat) return;
+
+    // If user is typing in a text field, let space pass
+    if (event.target.matches('input, textarea, [contenteditable="true"]')) {
+      return;
+    }
+
+    // Prevent scrolling when pressing space
+    event.preventDefault();
+    this.pressStartCommon();
+  }
+
+  spaceUp(event) {
+    if (event.code !== "Space") return;
+
+    // Same text field check
+    if (event.target.matches('input, textarea, [contenteditable="true"]')) {
+      return;
+    }
+
+    // Prevent scroll on space release
+    event.preventDefault();
+    this.pressEndCommon();
+  }
+
+
 
   async updateAudioDevices() {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -517,65 +553,6 @@ export default class extends Controller {
       this.statusTarget.textContent = message;
       this.statusTarget.className = `voice-status text-${type}`;
     }
-  }
-
-  // Action methods for Stimulus
-  // Action methods for Stimulus
-  handleClick(event) {
-    // If we're disconnected or in error state, try to reconnect
-    if (!this.isConnected) {
-      this.initializeConnection();
-      return;
-    }
-  }
-
-  handleMouseDown(event) {
-    if (!this.audioTrack || !this.isConnected) return;
-    this.pressStartTime = Date.now();
-    
-    // Clear any existing timer
-    if (this.holdTimer) {
-      clearTimeout(this.holdTimer);
-    }
-    
-    // Set timer for push-to-talk
-    this.holdTimer = setTimeout(() => {
-      if (this.audioTrack) {
-        this.pushTalkActive = true;
-        this.startTalking();
-      }
-    }, this.holdThreshold);
-  }
-
-  handleMouseUp(event) {
-    if (!this.audioTrack || !this.isConnected) return;
-    
-    // Clear the hold timer
-    if (this.holdTimer) {
-      clearTimeout(this.holdTimer);
-      this.holdTimer = null;
-    }
-    
-    const pressDuration = Date.now() - this.pressStartTime;
-    
-    if (this.pushTalkActive) {
-      // Was in push-to-talk mode
-      this.stopTalking();
-      this.pushTalkActive = false;
-    } else if (pressDuration < this.holdThreshold) {
-      // Short press - toggle mute
-      this.toggleMute();
-    }
-  }
-
-  handleTouchStart(event) {
-    this.handleMouseDown(event);
-  }
-
-  handleTouchEnd(event) {
-    this.handleMouseUp(event);
-    // Prevent mouseup from firing on touch devices
-    event.preventDefault();
   }
 
   enableVAD() {

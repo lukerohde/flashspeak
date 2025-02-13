@@ -36,12 +36,18 @@
           <!-- Microphone Controls -->
           <div id="microphone-controls" class="p-3 pb-0 d-flex flex-column align-items-center">
             <!-- Voice Button -->
-            <button class="voice-button" 
-                    data-voice-chat-target="walkieButton"
-                    data-action="mousedown->voice-chat#handleMouseDown mouseup->voice-chat#handleMouseUp touchstart->voice-chat#handleTouchStart touchend->voice-chat#handleTouchEnd click->voice-chat#handleClick"
-                    data-state="disconnected"
-                    data-muted="true"
-                    title="Hold to talk or tap to toggle mute">
+            <button
+              class="voice-button"
+              data-voice-chat-target="walkieButton"
+              data-action="
+                pointerdown->voice-chat#pressStart
+                pointerup->voice-chat#pressEnd
+                keydown@window->voice-chat#spaceDown
+                keyup@window->voice-chat#spaceUp
+              "
+              data-state="disconnected"
+              data-muted="true"
+              title="Hold to talk or tap to toggle mute">
               <i class="bi bi-telephone-x"></i>
             </button>
 
