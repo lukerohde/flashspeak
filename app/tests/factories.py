@@ -1,7 +1,6 @@
 # tests/factories.py
 import factory
 from django.contrib.auth.models import User
-from main.models import Thing
 from flashcards.models import FlashCard
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -20,14 +19,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     def password_save(obj, create, extracted, **kwargs):
         if create:
             obj.save()
-
-class ThingFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Thing
-    
-    owner = factory.SubFactory(UserFactory)
-    name = factory.Sequence(lambda n: f"Thing {n}")
-
 
 class FlashCardFactory(factory.django.DjangoModelFactory):
     class Meta:

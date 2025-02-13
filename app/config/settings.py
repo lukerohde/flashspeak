@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',  # Example provider
     'whitenoise.runserver_nostatic', # disable django static file serving so whitenoise can work
     'rest_framework',
-    'main',
     'voice_chat',
     'flashcards',
 ]
@@ -81,7 +80,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'main.context_processors.generic_context',
             ],
         },
     },

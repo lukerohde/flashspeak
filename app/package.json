@@ -1,5 +1,5 @@
 {
-  "name": "voice-anki",
+  "name": "flashspeak",
   "version": "1.0.0",
   "description": "Web application",
   "private": true,
@@ -13,8 +13,8 @@
     "test:e2e:debug": "playwright --debug",
     "test:e2e:install": "playwright install chromium",
     "test:e2e:show-report": "npx playwright show-report --host 0.0.0.0 --port 9323",
-    "lint": "eslint 'main/js/**/*.js' 'static/js/**/*.js'",
-    "format": "prettier --write 'main/js/**/*.js' 'static/js/**/*.js'",
+    "lint": "eslint 'voice_chat/js/**/*.js' 'flashcards/js/**/*.js' 'static/js/**/*.js'",
+    "format": "prettier --write 'voice_chat/js/**/*.js' 'flashcards/js/**/*.js' 'static/js/**/*.js'",
     "fix": "npm run format && npm run lint"
   },
   "dependencies": {
