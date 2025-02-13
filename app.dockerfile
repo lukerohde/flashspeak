@@ -118,7 +118,11 @@ WORKDIR /home/pyuser/app
 # Copy installed python packages and built app from builder stage
 COPY --from=devtest /home/pyuser/.local /home/pyuser/.local
 COPY --from=devtest /home/pyuser/app/main /home/pyuser/app/main
-COPY --from=devtest /home/pyuser/app/voice-anki /home/pyuser/app/voice-anki
+COPY --from=devtest /home/pyuser/app/config /home/pyuser/app/config
+COPY --from=devtest /home/pyuser/app/flashcards /home/pyuser/app/flashcards
+COPY --from=devtest /home/pyuser/app/static/dist /home/pyuser/app/static/dist
+COPY --from=devtest /home/pyuser/app/static/sounds /home/pyuser/app/static/sounds
+COPY --from=devtest /home/pyuser/app/voice_chat /home/pyuser/app/voice_chat
 COPY --from=devtest /home/pyuser/app/templates /home/pyuser/app/templates
 COPY --from=devtest /home/pyuser/app/manage.py /home/pyuser/app/manage.py
 COPY --from=devtest /home/pyuser/app/start /home/pyuser/app/start

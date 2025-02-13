@@ -17,6 +17,7 @@ RENDER_API_KEY=your_key_here
 
 2. Create a render blueprint:
    - copy deploy-render/render.yaml.example to render.yaml in the root, and check it over
+   - Commit render.yml.  Render needs it to get started.
    - In Render Dashboard;
     - +New - Blueprint
     - Name: your-app-name 
