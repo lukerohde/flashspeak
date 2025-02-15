@@ -226,7 +226,7 @@ export default class extends Controller {
     The complete card content is:
     Front: "${front}"
     Back: "${back}"
-    Do not tell me the answer but give me a hint of why my previous answer was not good enough.`
+    The answer is at the back. Do not tell me the answer at the back but give me a hint of why my previous answer was not good enough.`
     this.addContext(instruction)
   }
 
