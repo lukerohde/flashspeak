@@ -113,9 +113,7 @@ export default class extends Controller {
     const back = card.dataset.flashcardBackValue
     
     // Instruction to read both sides
-    const instruction = `Please read both sides of this flashcard. Front: "${front}". Back: "${back}".`
-    this.dispatch('add-context', { detail: instruction })
-    this.dispatch('please-respond')
+    this.addContext(`Please read both sides of this flashcard. Front: "${front}". Back: "${back}".`)
   }
 
   async fetchNextCard() {
@@ -173,12 +171,24 @@ export default class extends Controller {
     Assistant: パスポートを見せてください
     User: Please show me your passport
     <assistant uses judge_card(correct)>
-    
+
     Assistant: I have a reservation
     User: よよくがあります
     Assistant: Not quiet, reservation is よやく
     User: よやくがあります
     <assistant uses judge_card(hard)>
+
+    Assistant: Bicycle
+    User: Bicycle
+    Assistant: Please answer with Japanese
+    User: 自転車
+    <assistant uses judge_card(correct)>
+    
+    Assistant: 自転車
+    User: 自転車
+    Assistant: Please answer with English
+    User: Bicycle
+    <assistant uses judge_card(correct)>
 
     Assistant: Room
     User: I forgot
@@ -202,10 +212,29 @@ export default class extends Controller {
     <assistant uses judge_card(correct)>
     `
     
-    this.dispatch('add-context', { detail: instruction })
-    this.dispatch('please-respond')
+    this.addContext(instruction)
   }
 
+  explainErrorResponse(card) {
+    const side = card.dataset.flashcardSide
+    const front = card.dataset.flashcardFrontValue
+    const back = card.dataset.flashcardBackValue
+    const shownContent = side === 'front' ? front : back
+
+    const instruction = `We are reviewing flashcards.
+    Currently showing the ${side}: "${shownContent}"
+    The complete card content is:
+    Front: "${front}"
+    Back: "${back}"
+    The answer is at the back. Do not tell me the answer at the back but give me a hint of why my previous answer was not good enough.`
+    this.addContext(instruction)
+  }
+
+  addContext(context) {
+    this.dispatch('add-context', { detail: context })
+    this.dispatch('please-respond')
+  }
+  
   // Handle self-assessment from user clicking buttons
   async handleSelfAssessment(event) {
     const status = event.target.dataset.status
@@ -256,7 +285,7 @@ export default class extends Controller {
       )
       
       if (!response.ok) throw new Error('Failed to update review')
-      
+        
       const data = await response.json()
 
       // Update the preview of the judged card and move it to the top
@@ -279,8 +308,12 @@ export default class extends Controller {
         }
       }
 
-      // Fetch the next card for review
-      await this.fetchNextCard()
+      if (status == 'forgot' || status == 'hard') {
+        this.explainErrorResponse(card)
+      } else {
+        // Fetch the next card for review
+        await this.fetchNextCard()
+      }
     } catch (error) {
       console.error('Error updating review:', error)
     }
