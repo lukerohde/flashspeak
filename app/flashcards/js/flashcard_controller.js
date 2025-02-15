@@ -171,12 +171,24 @@ export default class extends Controller {
     Assistant: パスポートを見せてください
     User: Please show me your passport
     <assistant uses judge_card(correct)>
-    
+
     Assistant: I have a reservation
     User: よよくがあります
     Assistant: Not quiet, reservation is よやく
     User: よやくがあります
     <assistant uses judge_card(hard)>
+
+    Assistant: Bicycle
+    User: Bicycle
+    Assistant: Please answer with Japanese
+    User: 自転車
+    <assistant uses judge_card(correct)>
+    
+    Assistant: 自転車
+    User: 自転車
+    Assistant: Please answer with English
+    User: Bicycle
+    <assistant uses judge_card(correct)>
 
     Assistant: Room
     User: I forgot
