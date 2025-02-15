@@ -19,6 +19,10 @@ restart: down up
 npm-build: up
 	docker-compose exec app npm run build
 
+# Build npm assets
+jest: up
+	docker-compose exec app npm run test
+
 # Start npm development mode in background (depends on docker being up)
 dev: up
 	docker-compose exec app npm run dev
