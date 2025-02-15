@@ -35,6 +35,11 @@
     "playwright": "^1.49.1",
     "prettier": "^3.4.2"
   },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions"
