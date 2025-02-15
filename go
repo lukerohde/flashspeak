@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ ! -f .env ]; then
   echo "Please run ./setup to setup your environment"
-  exit 
+  exit
 fi
 
 docker-compose up -d 

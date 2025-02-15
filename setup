@@ -17,7 +17,7 @@ if [ ! -f .env ]; then
 
     cp .env.example .env
     rm -Rf .pg_data/ # any password previously set won't work now
-    
+
     # Generate passwords
     DJANGO_SUPERUSER_PASSWORD=$(generate_password)
     POSTGRES_PASSWORD=$(generate_password)
