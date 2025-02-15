@@ -1,4 +1,0 @@
-config:
-  aws:region: ap-southeast-2
-  example-project-s3:mediaBucketName: dev-example-project-media
-  example-project-s3:allowedOrigins: https://dev.voice-anki.online,https://voice-anki.render.com,https://*.dev.voice-anki.online,https://*.voice-anki.render.com

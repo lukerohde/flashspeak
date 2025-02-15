@@ -4,11 +4,6 @@ services:
       context: .
       dockerfile: ./app.dockerfile
       target: production
-      args:
-        AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-        AWS_REGION: $AWS_REGION
-        AWS_MEDIA_BUCKET_NAME: $AWS_MEDIA_BUCKET_NAME
     restart: unless-stopped
     environment:
       - APP_PORT
@@ -23,10 +18,6 @@ services:
       - DJANGO_ALLOWED_HOSTS
       - DJANGO_DEBUG
       - OPENAI_API_KEY
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_REGION
-      - AWS_MEDIA_BUCKET_NAME
     links:
       - pg
     tty: true

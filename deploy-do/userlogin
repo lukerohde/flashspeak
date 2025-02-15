@@ -1,4 +1,0 @@
-#!/bin/bash
-. ./.digital_ocean_env
-
-ssh $DIGITAL_OCEAN_APP_USER@$DROPLET_IP

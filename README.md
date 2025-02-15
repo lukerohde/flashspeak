@@ -121,73 +121,54 @@ Run the setup script to configure your project name and `.env` plus `docker-comp
 ```
 ./setup
 ```
-
-This will setup your .env and docker-compose.override.yml file for local development.
-
-```
-docker-compose up -d
 ```
 
-see logs
-```
-docker-compose logs
-```
-
-Shell into the python app container
-```
-docker-compose exec app /bin/bash
-```
-
-To make typing these commands less tedious it helps to have docker aliases in your .bash_profile or similar
-```
-alias dc='docker-compose'
-alias dcu='docker-compose up -d'
-alias dcd='docker-compose down'
-alias dcl='docker-compose logs'
-```
-
-Once in the app container you can run the django commands
-```
-python manage.py runserver 0.0.0.0:3000
-``` 
-
-To rebuild your javascript
-```
-npm run build
-```
-
-To have up to date not reloading CSS and JS during development
-```
-npm run dev
-``` 
-
-To run with a production gunicorn server
-```
-./start
-```
-
-To run tests
-```
-pytest
-```
-
-To run playwright tests in headed mode
-Start your x server (hint: `brew install xquartz` and permit your server)
+Start developing
 
 ```
-pytest --headed
+make run
 ```
 
-To debug your playwright tests
+For hot asset reloading, in another terminal run
+
 ```
-PWDEBUG=1 pytest --headed
+make dev
 ```
+
+Sign in 
+1. http://localhost:3000
+2. your username and password are in .env
+
+To see how to run other stuff
+
+```
+make help
+```
+
+## For headed Playwright testing on macOS:
+
+1. Install XQuartz:
+
+   ```
+   brew install --cask xquartz
+   ```
+   
+2. follow [x11 on docker](https://gist.github.com/cschiewek/246a244ba23da8b9f0e7b11a68bf3285)
+
+
+3. Run headed Playwright tests:
+   ```
+   make test-headed
+   ```
+
+## To develop on mobile
 
 To view and debug your app on mobile (mobile webrtc needs https) or share a dev preview external 
 
 ```brew install ngrok```
 
 Sign up and setup your token [here](https://dashboard.ngrok.com/get-started/your-authtoken)
+
 ```
 ngrok http 3000
 ```
@@ -199,6 +180,4 @@ Responsive design mode for
 
 For more detailed instructions, please refer to the following README files:
 
-- [Deploy to AWS](deploy-aws-infra/pulumi/README.md) - just the asset bucket
 - [Deploy to Render](deploy-render/README.md)
-- [Deploy to Digital Ocean](deploy-do/README.md)

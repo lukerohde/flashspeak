@@ -145,41 +145,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_NUMBER_FILES = 10
 
-# Configure storage
-if not os.environ.get('AWS_ACCESS_KEY_ID') or DEBUG:
-    print("In DEBUG mode, using FileSystemStorage with whitenoise for static files")
-    print("With CDN caching, whitenoise should be used in production too.")
-    print("Consider updating our pulumi to deploy acloudfront distribution instead of a bucket.")
-    
-    # Whitenoise configuration
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    WHITENOISE_USE_FINDERS = True
-    WHITENOISE_MANIFEST_STRICT = False
-    WHITENOISE_AUTOREFRESH = True
-else:
-    # S3 Storage Settings
-    print("In PRODUCTION mode, using s3 Storage for static assets and media.  Remember to 'collectstatic'")
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3.S3Storage",
-            "OPTIONS": {
-                "access_key": os.environ.get('AWS_ACCESS_KEY_ID'),
-                "secret_key": os.environ.get('AWS_SECRET_ACCESS_KEY'),
-                "bucket_name": os.environ.get('AWS_MEDIA_BUCKET_NAME'),
-                "region_name": os.environ.get('AWS_S3_REGION_NAME', 'ap-southeast-1'),
-                "object_parameters": {"CacheControl": "max-age=86400"},
-            },
-        },
-        "staticfiles": {
-            "BACKEND": "storages.backends.s3.S3Storage",
-            "OPTIONS": {
-                "bucket_name": os.environ.get('AWS_MEDIA_BUCKET_NAME'),
-            }
-        }
-    }
-    
-    # Add storages to INSTALLED_APPS
-    INSTALLED_APPS += ['storages']
+# Whitenoise configuration
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_AUTOREFRESH = True
 
 # Authentication
 AUTHENTICATION_BACKENDS = (

@@ -46,20 +46,6 @@ WORKDIR /home/pyuser/app
 RUN chown -R pyuser:pyuser /home/pyuser/app
 USER pyuser
 
-# Set build-time arguments for AWS credentials - for deploying static assets
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_REGION
-ARG AWS_MEDIA_BUCKET_NAME
-ARG DJANGO_DEBUG
-
-# Environment variables for runtime and build-time
-ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-ENV AWS_REGION=$AWS_REGION
-ENV AWS_MEDIA_BUCKET_NAME=$AWS_MEDIA_BUCKET_NAME
-ENV DJANGO_DEBUG=$DJANGO_DEBUG
-
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
